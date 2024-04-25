@@ -1,6 +1,11 @@
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/test09?allowPublicKeyRetrieval=true
+  data:
+    mongodb:
+      port: 27017
+      host: 10.8.0.3
+      database: users
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#    username: postgres
+#    password: postgres
+#    url: jdbc:postgresql://localhost:5432/test09?allowPublicKeyRetrieval=true
