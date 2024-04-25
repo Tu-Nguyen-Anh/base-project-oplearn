@@ -1,7 +1,5 @@
 package org.oplearn.project.service.base;
 
-import org.oplearn.project.repository.BaseRepository;
-
 import java.util.List;
 
 public class BaseServiceImpl<T> implements BaseService<T> {
