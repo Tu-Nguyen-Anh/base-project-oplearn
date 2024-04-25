@@ -33,7 +33,7 @@ public class SecurityConfiguration {
         httpSecurity
                 .securityMatcher(OpLearnConstants.AuthConstant.MATCHER_USER_API)
                 .authorizeHttpRequests(auth -> {
-                    auth.anyRequest().authenticated();
+                    auth.anyRequest().permitAll();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
