@@ -1,6 +1,4 @@
 spring:
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: postgres
-    url: jdbc:postgresql://localhost:5432/test09?allowPublicKeyRetrieval=true
+  data:
+    mongodb:
+      uri: mongodb://192.168.143.73:27017/users
