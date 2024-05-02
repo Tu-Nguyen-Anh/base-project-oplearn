@@ -1,9 +1,19 @@
+#spring:
+#  data:
+#    mongodb:
+#      port: 27017
+#      host: 10.8.0.3
+#      database: users
+
+#spring:
+#  data:
+#    mongodb:
+#      uri: mongodb://10.8.0.3:27017/users
+
 spring:
   data:
     mongodb:
-      port: 27017
-      host: 10.8.0.3
-      database: users
+      uri: mongodb://localhost:27017/users
 #  datasource:
 #    driver-class-name: org.postgresql.Driver
 #    username: postgres

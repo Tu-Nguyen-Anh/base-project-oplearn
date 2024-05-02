@@ -1,8 +1,10 @@
 package org.oplearn.project.service;
 
 import org.oplearn.project.dto.request.UserRequest;
+import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.UserResponse;
-import org.springframework.data.domain.Page;
+
+import java.util.List;
 
 public interface UserService {
   UserResponse create(UserRequest request);
@@ -10,5 +12,7 @@ public interface UserService {
   UserResponse update(UserRequest request, String id);
 
   void delete(String id);
-  Page<UserResponse> list(String keyword, int size, int page, boolean isAll);
+  List<UserResponse> list(String keyword, int size, int page, boolean isAll);
+
+  UserResponse detail(String id);
 }

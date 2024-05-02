@@ -7,6 +7,7 @@ import org.oplearn.project.utils.DateUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Data
 @AllArgsConstructor(staticName = "of")
@@ -21,4 +22,16 @@ public class ResponseGeneral<T> {
   public static <T> ResponseGeneral<T> of(int status, String message, T data) {
     return of(status, message, data, DateUtils.getCurrentDateString());
   }
+  public static <T> ResponseGeneral<T> ofCreated(String message, T data) {
+    return of(HttpStatus.CREATED.value(), message, data, DateUtils.getCurrentDateString());
+  }
+
+  public static <T> ResponseGeneral<T> ofSuccess(String message, T data) {
+    return of(HttpStatus.OK.value(), message, data, DateUtils.getCurrentDateString());
+  }
+
+  public static <T> ResponseGeneral<T> ofSuccess(String message) {
+    return of(HttpStatus.OK.value(), message, null, DateUtils.getCurrentDateString());
+  }
+
 }
