@@ -27,5 +27,13 @@ public class Addresses {
   @Field("ward")
   private String ward;
   @Field("is_deleted")
-  private Boolean isDeleted;
+  private boolean isDeleted;
+
+  public Addresses(Integer id, String province, String district, String ward) {
+    this.id = id;
+    this.province = province;
+    this.district = district;
+    this.ward = ward;
+    this.isDeleted = false;
+  }
 }
