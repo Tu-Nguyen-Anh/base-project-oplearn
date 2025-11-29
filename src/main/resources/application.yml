@@ -1,18 +1,42 @@
 spring:
   application:
-    name: openlearnhub
+    name: soar
   profiles:
-    active:
-      - dev
-      - dev-local
+    active: ${PROFILE_ACTIVE:dev}
   liquibase:
     change-log: classpath:db/master.xml
+  servlet:
+    multipart:
+      enabled: true
+      file-size-threshold: 2KB
+      max-file-size: 50MB
+      max-request-size: 500MB
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ncshoadondientu@gmail.com
+    password: nbdl rklu scba ztzo
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
 server:
-  port: 8088
+  port: ${PORT_INTERNAL:8888}
 
 logging:
   level:
     sql: debug
-conditional:
-  bean:
-    messageService: true
+
+jwt:
+  access-token:
+    secret-key: b3NpbnRfYXBpX2F1dGhvcml6YXRpb25AMjAyM19hY2Nlc3NfdG9rZW4=
+    ttl: 2592000000
+  refresh-token:
+    secret-key: b3NpbnRfYXBpX2F1dGhvcml6YXRpb25AMjAyM19yZWZyZXNoX3Rva2Vu
+    ttl: 3592000000
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:localhost:8888}

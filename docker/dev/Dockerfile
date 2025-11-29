@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM maven AS build-dependency
+FROM maven:3-eclipse-temurin-17 AS build-dependency
 
 ARG WORKDIR=/opt/app
 
@@ -26,10 +26,20 @@ FROM eclipse-temurin:17-jre-alpine
 ARG WORKDIR=/opt/app
 WORKDIR ${WORKDIR}
 
+# Set the timezone.
+ENV TZ=Asia/Ho_Chi_Minh
+RUN set -x \
+    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
+
+RUN addgroup twoup && adduser -S twoup -G twoup
+RUN chown -R twoup:twoup /opt/app
+USER twoup
+
 COPY --from=builder ${WORKDIR}/dependencies/ ./
 COPY --from=builder ${WORKDIR}/spring-boot-loader/ ./
 COPY --from=builder ${WORKDIR}/snapshot-dependencies/ ./
 COPY --from=builder ${WORKDIR}/application/ ./
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "-XX:+UseG1GC", "-Xms512m", "-Xmx768m", "-Xss512k", "-XX:MaxRAM=72m", "org.springframework.boot.loader.launch.JarLauncher"]
 
 

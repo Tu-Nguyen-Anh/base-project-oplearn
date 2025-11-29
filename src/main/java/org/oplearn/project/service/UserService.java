@@ -1,18 +1,36 @@
 package org.oplearn.project.service;
 
+import org.oplearn.project.dto.request.UserFilterRequest;
 import org.oplearn.project.dto.request.UserRequest;
 import org.oplearn.project.dto.response.PageResponse;
-import org.oplearn.project.dto.response.UserResponse;
-
-import java.util.List;
+import org.oplearn.project.dto.response.user.UserFilterResponse;
+import org.oplearn.project.dto.response.user.UserResponse;
+import org.oplearn.project.entity.user.User;
 
 public interface UserService {
-  UserResponse create(UserRequest request);
+    User getById(Long userId);
 
-  UserResponse update(UserRequest request, String id);
+    User findByUsername(String userName);
 
-  void delete(String id);
-  List<UserResponse> list(String keyword, int size, int page, boolean isAll);
+    UserResponse create(UserRequest request);
 
-  UserResponse detail(String id);
+    UserResponse update(UserRequest request, Long id);
+
+    void delete(Long id);
+
+    void checkUsernameExists(String username);
+
+    void checkPhoneNumberExists(String phoneNumber);
+
+    void checkEmailExists(String email);
+
+    void resetPassword(Long id, String randomPassword);
+
+    void save(User users);
+
+    PageResponse<UserFilterResponse> filter(UserFilterRequest request);
+
+    UserResponse detail(Long id);
+
+    public User checkExistById(Long id);
 }

@@ -2,7 +2,7 @@
 
 docker-compose down
 
-git pull
+git pull origin develop
 
 echo "Starting Docker containers..."
 docker-compose up -d --build

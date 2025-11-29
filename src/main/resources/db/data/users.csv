@@ -1,0 +1,2 @@
+id,type,username,password,email,full_name,phone,status,avatar,deleted,last_updated_by,last_updated_at,created_by,created_at
+1,1,admin,$2a$12$FOoXjXwCp06aGgmYyLi08.2ffzQecF1uyqa/TvFXwCN1/C7U/NDNW,nguyen.anh.tu.dev@gmail.com,Nguyen Anh Tu,0397981415,0,,false,admin,1672531200000,admin,1672531200000
