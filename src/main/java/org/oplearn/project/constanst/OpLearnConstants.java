@@ -22,7 +22,7 @@ public class OpLearnConstants {
         public static final String BAD_REQUEST_MESSAGE = "Bad request";
         public static final String CONFLICT_MESSAGE = "Conflict occurred";
         public static final String BLANK_MESSAGE = "";
-        public static final String DEFAULT_PASSWORD = "news@2025";
+        public static final String DEFAULT_PASSWORD = "News@2025";
     }
 
 

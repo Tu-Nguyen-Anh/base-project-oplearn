@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.Locale;
 import java.util.Map;
@@ -25,101 +26,120 @@ import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.*;
 @RestControllerAdvice
 @RequiredArgsConstructor
 public class ExceptionHandlerAdvice {
-  private final MessageSource messageSource;
+    private final MessageSource messageSource;
 
-  @ExceptionHandler(value = {BaseException.class})
-  public ResponseEntity<ResponseGeneral<Error>> handleFinanceBaseException(
-        BaseException ex,
-        WebRequest webRequest
-  ) {
-    return ResponseEntity
-          .status(ex.getStatus())
-          .body(getError(ex.getStatus(), ex.getCode(), webRequest.getLocale(), ex.getParams()));
-  }
-
-  @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ResponseGeneral<Error>> handleValidationExceptions(
-        MethodArgumentNotValidException exception,
-        WebRequest webRequest
-  ) {
-    log.error("(handleValidationExceptions)exception: {}", exception.getMessage());
-    String language = Objects.nonNull(webRequest.getHeader(LANGUAGE)) ?
-          webRequest.getHeader(LANGUAGE) : DEFAULT_LANGUAGE;
-
-    String errorMessage = exception.getBindingResult().getFieldErrors().stream()
-          .map(fieldError -> fieldError.getDefaultMessage())
-          .findFirst()
-          .orElse(exception.getMessage());
-
-    log.error("(handleValidationExceptions) {}", errorMessage);
-    return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(getError(HttpStatus.BAD_REQUEST.value(), errorMessage, language));
-  }
-
-  @ExceptionHandler(ConstraintViolationException.class)
-  public ResponseEntity<ResponseGeneral<Error>> handleConstraintViolationExceptions(
-        ConstraintViolationException exception,
-        WebRequest webRequest
-  ) {
-    log.error("(handleConstraintViolationExceptions) exception: {}", exception.getMessage());
-    String language = Objects.nonNull(webRequest.getHeader(LANGUAGE)) ?
-          webRequest.getHeader(LANGUAGE) : DEFAULT_LANGUAGE;
-
-    String errorMessage = exception.getConstraintViolations().stream()
-          .map(constraintViolation -> constraintViolation.getMessage())
-          .findFirst()
-          .orElse(exception.getMessage());
-
-    log.error("(handleConstraintViolationExceptions) {}", errorMessage);
-    return ResponseEntity
-          .status(HttpStatus.BAD_REQUEST)
-          .body(getError(HttpStatus.BAD_REQUEST.value(), errorMessage, language));
-  }
-
-  private ResponseGeneral<Error> getError(int status, String code, String language) {
-    return ResponseGeneral.of(
-          status,
-          HttpStatus.valueOf(status).getReasonPhrase(),
-          Error.of(code, getMessage(code, new Locale(language)))
-    );
-  }
-
-  private ResponseGeneral<Error> getError(int status, String code, Map<String, String> params) {
-    return ResponseGeneral.of(
-          status,
-          HttpStatus.valueOf(status).getReasonPhrase(),
-          Error.of(code, params)
-    );
-  }
-
-  private ResponseGeneral<Error> getError(int status, String code, Locale locale, Map<String, String> params) {
-    return ResponseGeneral.of(
-          status,
-          HttpStatus.valueOf(status).getReasonPhrase(),
-          Error.of(code, getMessage(code, locale, params))
-    );
-  }
-
-  private String getMessage(String code, Locale locale, Map<String, String> params) {
-    var message = getMessage(code, locale);
-    if (params != null && !params.isEmpty()) {
-      for (var param : params.entrySet()) {
-        message = message.replace(getMessageParamsKey(param.getKey()), param.getValue());
-      }
+    @ExceptionHandler(value = {BaseException.class})
+    public ResponseEntity<ResponseGeneral<Error>> handleFinanceBaseException(
+            BaseException ex,
+            WebRequest webRequest
+    ) {
+        return ResponseEntity
+                .status(ex.getStatus())
+                .body(getError(ex.getStatus(), ex.getCode(), webRequest.getLocale(), ex.getParams()));
     }
-    return message;
-  }
 
-  private String getMessage(String code, Locale locale) {
-    try {
-      return messageSource.getMessage(code, null, locale);
-    } catch (Exception ex) {
-      return code;
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ResponseGeneral<Error>> handleValidationExceptions(
+            MethodArgumentNotValidException exception,
+            WebRequest webRequest
+    ) {
+        log.error("(handleValidationExceptions)exception: {}", exception.getMessage());
+        String language = Objects.nonNull(webRequest.getHeader(LANGUAGE)) ?
+                webRequest.getHeader(LANGUAGE) : DEFAULT_LANGUAGE;
+
+        String errorMessage = exception.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> fieldError.getField() + " " + fieldError.getDefaultMessage())
+                .findFirst()
+                .orElse(exception.getMessage());
+
+        log.error("(handleValidationExceptions) {}", errorMessage);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(getError(HttpStatus.BAD_REQUEST.value(), errorMessage, language));
     }
-  }
 
-  private String getMessageParamsKey(String key) {
-    return PERCENT + key + PERCENT;
-  }
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ResponseGeneral<Error>> handleConstraintViolationExceptions(
+            ConstraintViolationException exception,
+            WebRequest webRequest
+    ) {
+        log.error("(handleConstraintViolationExceptions) exception: {}", exception.getMessage());
+        String language = Objects.nonNull(webRequest.getHeader(LANGUAGE)) ?
+                webRequest.getHeader(LANGUAGE) : DEFAULT_LANGUAGE;
+
+        String errorMessage = exception.getConstraintViolations().stream()
+                .map(constraintViolation -> constraintViolation.getMessage())
+                .findFirst()
+                .orElse(exception.getMessage());
+
+        log.error("(handleConstraintViolationExceptions) {}", errorMessage);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(getError(HttpStatus.BAD_REQUEST.value(), errorMessage, language));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseGeneral<Error>> handleAllExceptions(
+            Exception ex,
+            WebRequest webRequest
+    ) {
+        log.error("Unhandled exception: {}", ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(getError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", String.valueOf(webRequest.getLocale())));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<String> handleMaxSizeException(MaxUploadSizeExceededException ex) {
+        return ResponseEntity
+                .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body("File size exceeds the maximum allowed limit!");
+    }
+
+
+    private ResponseGeneral<Error> getError(int status, String code, String language) {
+        return ResponseGeneral.of(
+                status,
+                HttpStatus.valueOf(status).getReasonPhrase(),
+                Error.of(code, getMessage(code, new Locale(language)))
+        );
+    }
+
+    private ResponseGeneral<Error> getError(int status, String code, Map<String, String> params) {
+        return ResponseGeneral.of(
+                status,
+                HttpStatus.valueOf(status).getReasonPhrase(),
+                Error.of(code, params)
+        );
+    }
+
+    private ResponseGeneral<Error> getError(int status, String code, Locale locale, Map<String, String> params) {
+        return ResponseGeneral.of(
+                status,
+                HttpStatus.valueOf(status).getReasonPhrase(),
+                Error.of(code, getMessage(code, locale, params))
+        );
+    }
+
+    private String getMessage(String code, Locale locale, Map<String, String> params) {
+        var message = getMessage(code, locale);
+        if (params != null && !params.isEmpty()) {
+            for (var param : params.entrySet()) {
+                message = message.replace(getMessageParamsKey(param.getKey()), param.getValue());
+            }
+        }
+        return message;
+    }
+
+    private String getMessage(String code, Locale locale) {
+        try {
+            return messageSource.getMessage(code, null, locale);
+        } catch (Exception ex) {
+            return code;
+        }
+    }
+
+    private String getMessageParamsKey(String key) {
+        return PERCENT + key + PERCENT;
+    }
 }

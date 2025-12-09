@@ -21,49 +21,58 @@ import static org.oplearn.project.constanst.OpLearnConstants.Message.SUCCESS;
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticateController {
-  private final AuthenticateFacadeService authenticateFacadeService;
-  private final MessageService messageService;
+    private final AuthenticateFacadeService authenticateFacadeService;
+    private final MessageService messageService;
 
-  @PostMapping("/login")
-  public ResponseGeneral<LoginResponse> login(
-        @RequestBody LoginRequest request,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    @PostMapping("/login")
+    public ResponseGeneral<LoginResponse> login(
+            @RequestBody LoginRequest request,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
 
-  ) {
-    log.info("=== Start login ");
-    log.debug("(login) request: {}", request);
+    ) {
+        log.info("=== Start login ");
+        log.debug("(login) request: {}", request);
 
-    return ResponseGeneral.ofSuccess(
-          messageService.getMessage(SUCCESS, language),
-          authenticateFacadeService.authenticate(request)
-    );
-  }
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                authenticateFacadeService.authenticate(request)
+        );
+    }
 
-  @PostMapping("logout")
-  public ResponseGeneral<Void> logout(
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
-  ) {
-    log.info("====> Start logout");
-    log.debug("====> (logout) ");
+    @PostMapping("logout")
+    public ResponseGeneral<Void> logout(
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("====> Start logout");
+        log.debug("====> (logout) ");
 
-    authenticateFacadeService.logout();
+        authenticateFacadeService.logout();
 
-    return ResponseGeneral.ofSuccess(
-          messageService.getMessage(SUCCESS, language)
-    );
-  }
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
 
-  @PostMapping("/refresh")
-  public ResponseGeneral<LoginResponse> refresh(
-        @RequestBody RefreshTokenRequest request,
-        @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    @PostMapping("/refresh")
+    public ResponseGeneral<LoginResponse> refresh(
+            @RequestBody RefreshTokenRequest request,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
 
-  ) {
-    log.info("====> Start refresh");
-    log.debug("====> (refresh) request: {}", request);
+    ) {
+        log.info("====> Start refresh");
+        log.debug("====> (refresh) request: {}", request);
 
-    return ResponseGeneral.ofSuccess(
-          messageService.getMessage(SUCCESS, language),
-          authenticateFacadeService.refreshToken(request));
-  }
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                authenticateFacadeService.refreshToken(request));
+    }
+
+    @GetMapping("/get-session")
+    public ResponseGeneral<String> getSession(
+    ) {
+        log.info("=== Start getSession ");
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, "en"), "ok"
+        );
+    }
 }

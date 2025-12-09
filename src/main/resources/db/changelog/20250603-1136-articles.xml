@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="create-articles-table" author="tuna">
+        <createTable tableName="articles">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(1024)"/>
+            <column name="link" type="VARCHAR(1024)"/>
+            <column name="guid" type="VARCHAR(1024)"/>
+            <column name="description" type="TEXT"/>
+            <column name="pub_date" type="bigint"/>
+            <column name="image_link" type="text"/>
+            <column name="topic_id" type="BIGINT"/>
+            <column name="deleted" type="BOOLEAN" defaultValue="false"/>
+            <column name="last_updated_by" type="varchar(255)"/>
+            <column name="last_updated_at" type="bigint"/>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="created_at" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="articles" baseColumnNames="topic_id"
+                referencedTableName="topics" referencedColumnNames="id"
+                constraintName="fk_article_topic_id_topic_id"/>
+
+        <addUniqueConstraint
+                tableName="articles"
+                columnNames="link"
+                constraintName="uk_articles_link"/>
+
+        <addUniqueConstraint
+                tableName="articles"
+                columnNames="guid"
+                constraintName="uk_articles_guid"/>
+
+    </changeSet>
+</databaseChangeLog>

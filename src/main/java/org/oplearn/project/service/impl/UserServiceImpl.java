@@ -50,6 +50,8 @@ public class UserServiceImpl implements UserService {
         log.info("create");
         log.debug("Request: {}", request);
 
+        this.checkValidateCreate(request);
+
         User user = this.mapRequestToEntity(request);
 
         user = repository.save(user);
@@ -57,6 +59,15 @@ public class UserServiceImpl implements UserService {
         return this.mapEntityToResponse(user);
     }
 
+    private void checkValidateCreate(UserRequest request) {
+        log.info("checkValidateCreate");
+        log.debug("request: {}", request);
+
+        this.checkEmailExists(request.getEmail());
+        this.checkPhoneNumberExists(request.getPhoneNumber());
+        this.checkUsernameExists(request.getUsername());
+
+    }
 
     private User mapRequestToEntity(UserRequest userRequest) {
         return new User(
@@ -113,6 +124,7 @@ public class UserServiceImpl implements UserService {
         log.debug("(checkUsernameExists) username: {}", username);
 
         if (isUsernameExisted(username)) {
+            log.error("Username {} already exists", username);
             throw new UsernameAlreadyExistedException();
         }
     }
@@ -124,6 +136,7 @@ public class UserServiceImpl implements UserService {
 
 
         if (isPhoneExisted(phoneNumber)) {
+            log.error("Phone number {} already exists", phoneNumber);
             throw new PhoneNumberAlreadyExistedException();
         }
     }
@@ -132,9 +145,9 @@ public class UserServiceImpl implements UserService {
     public void checkEmailExists(String email) {
         log.info("=== Start CheckEmailExists");
         log.debug("(checkEmailExists) email:{}", email);
-
-
+        
         if (isEmailExisted(email)) {
+            log.error("Email {} already exists", email);
             throw new EmailAlreadyExistedException();
         }
     }

@@ -12,7 +12,7 @@ services:
     env_file:
       - .env
     networks:
-      - soar-network
+      - news-network
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
