@@ -25,7 +25,7 @@ spring:
           ssl:
             trust: smtp.gmail.com
 server:
-  port: ${PORT_INTERNAL:8888}
+  port: ${PORT_INTERNAL:8188}
 
 logging:
   level:
