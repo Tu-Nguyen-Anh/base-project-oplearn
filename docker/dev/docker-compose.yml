@@ -3,25 +3,50 @@ services:
     image: postgres:16.2-alpine
     container_name: postgres_news_db
     restart: unless-stopped
+
     environment:
       POSTGRES_DB: news_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+
     ports:
       - "54123:5432"
+
     volumes:
       - postgres_news_data:/var/lib/postgresql/data
+
+
+  redis_news:
+    image: redis:6.2-alpine
+    container_name: redis_news
+    restart: unless-stopped
+
+    ports:
+      - "6380:6379"
+
+    command: redis-server --save 20 1 --loglevel warning
+
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
 
   news:
     image: news_image:latest
     container_name: news
     restart: unless-stopped
+
     depends_on:
       - postgres_news
+      - redis_news
+
     ports:
       - "8188:8188"
+
     env_file:
       - .env
+
 
 volumes:
   postgres_news_data:
