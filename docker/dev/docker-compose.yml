@@ -1,25 +1,27 @@
-version: "3.9"
-
 services:
-  service-product-content:
-    build:
-      context: ../../
-      dockerfile: ./docker/dev/Dockerfile
+  postgres_news:
+    image: postgres:16.2-alpine
+    container_name: postgres_news_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: news_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "54123:5432"
+    volumes:
+      - postgres_news_data:/var/lib/postgresql/data
+
+  news:
     image: news_image:latest
     container_name: news
+    restart: unless-stopped
+    depends_on:
+      - postgres_news
     ports:
-      - ${PORT_EXTERNAL_DEV}:${PORT_INTERNAL}
+      - "8188:8188"
     env_file:
       - .env
-    networks:
-      - news-network
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
 
 volumes:
-  db-data:
-
-networks:
-  news-network:
-    driver: bridge
+  postgres_news_data:
