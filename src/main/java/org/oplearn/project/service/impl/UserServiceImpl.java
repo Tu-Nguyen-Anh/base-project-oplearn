@@ -5,6 +5,7 @@ import org.oplearn.project.dto.request.UserFilterRequest;
 import org.oplearn.project.dto.request.UserRequest;
 import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.user.UserFilterResponse;
+import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.dto.response.user.UserResponse;
 import org.oplearn.project.entity.user.User;
 import org.oplearn.project.exception.base.ForbiddenException;
@@ -241,6 +242,18 @@ public class UserServiceImpl implements UserService {
     private boolean isPhoneExisted(String phone) {
         return objectNotNullAndNotEmpty(phone)
                 && repository.existsByPhoneNumberAndDeletedIsFalse(phone);
+    }
+
+    @Override
+    public PageResponse<UserMentionResponse> searchForMention(String keyword, int page, int size) {
+        log.info("=== Start searchForMention");
+        log.debug("(searchForMention) keyword: {}, page: {}, size: {}", keyword, page, size);
+
+        Pageable pageable = PageRequest.of(page, size);
+        String kw = keyword == null ? "" : keyword;
+        Page<UserMentionResponse> result = repository.searchForMention(kw, pageable);
+
+        return PageResponse.of(result.getContent(), (int) result.getTotalElements());
     }
 
     private void setValueForUpdate(User user, UserRequest request) {

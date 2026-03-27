@@ -61,7 +61,7 @@ public class OpLearnConstants {
 
         public static String TYPE_TOKEN = "Bear ";
         public static String AUTHORIZATION = "Authorization";
-        public static String[] MATCHER_USER_API = {"/api/v1/auth/**","/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/"};
+        public static String[] MATCHER_USER_API = {"/api/v1/auth/**", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/actuator/", "/ws/**"};
         public static String[] MATCHER_ADMIN_API = {"/api/v1/admin/**"};
     }
 
@@ -79,6 +79,13 @@ public class OpLearnConstants {
         public static final int UNKNOWN = -1;
         public static final int INACTIVE = 1;
         public static final int ACTIVE = 0;
+    }
+
+    public static final class NotificationType {
+        private NotificationType() {
+        }
+
+        public static final String MENTION_IN_COMMENT = "MENTION_IN_COMMENT";
     }
 
     public static final class Message {
@@ -99,6 +106,57 @@ public class OpLearnConstants {
         public static final String DELETE_USER = "Đã xóa người dùng khỏi hệ thống";
 
 
+    }
+
+    public static final class ChatConstants {
+        private ChatConstants() {
+        }
+
+        public static final String ROLE_ADMIN = "ADMIN";
+        public static final String ROLE_MEMBER = "MEMBER";
+        public static final String MESSAGE_TYPE_TEXT = "TEXT";
+        public static final String MESSAGE_TYPE_IMAGE = "IMAGE";
+        public static final String WEBSOCKET_ENDPOINT = "/ws";
+        public static final String TOPIC_PREFIX = "/topic";
+        public static final String APP_PREFIX = "/app";
+        public static final String CHAT_TOPIC = "/topic/chat/";
+    }
+
+    public static final class ChatHistoryAction {
+        private ChatHistoryAction() {
+        }
+
+        public static final String CREATE_GROUP = "CREATE_GROUP";
+        public static final String RENAME_GROUP = "RENAME_GROUP";
+        public static final String ADD_MEMBER = "ADD_MEMBER";
+        public static final String REMOVE_MEMBER = "REMOVE_MEMBER";
+    }
+
+    public static final class ChatException {
+        private ChatException() {
+        }
+
+        public static final String CHAT_GROUP_NOT_FOUND = "org.oplearn.project.exception.base.chat.ChatGroupNotFoundException";
+        public static final String NOT_GROUP_MEMBER = "org.oplearn.project.exception.base.chat.NotGroupMemberException";
+        public static final String NOT_GROUP_ADMIN = "org.oplearn.project.exception.base.chat.NotGroupAdminException";
+        public static final String MEMBER_ALREADY_EXISTS = "org.oplearn.project.exception.base.chat.MemberAlreadyExistsException";
+        public static final String CHAT_MESSAGE_NOT_FOUND = "org.oplearn.project.exception.base.chat.ChatMessageNotFoundException";
+        public static final String REACTION_ALREADY_EXISTS = "org.oplearn.project.exception.base.chat.ReactionAlreadyExistsException";
+        public static final String REACTION_NOT_FOUND = "org.oplearn.project.exception.base.chat.ReactionNotFoundException";
+    }
+
+    public static final class ChatPresence {
+        private ChatPresence() {
+        }
+
+        public static final String ONLINE_USERS_KEY = "CHAT_ONLINE_USERS";
+        public static final String USER_ONLINE_KEY_PREFIX = "presence:online:";
+        public static final long ONLINE_TTL_MINUTES = 5L;
+        public static final String PRESENCE_TOPIC = "/topic/chat/%s/presence";
+        public static final String READ_RECEIPT_TOPIC = "/topic/chat/%s/read";
+        public static final String REACTION_TOPIC = "/topic/chat/%s/reaction";
+        public static final String REACTION_ADD = "ADD";
+        public static final String REACTION_REMOVE = "REMOVE";
     }
 
 }

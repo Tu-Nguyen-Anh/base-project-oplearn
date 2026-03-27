@@ -4,6 +4,7 @@ import org.oplearn.project.dto.request.UserFilterRequest;
 import org.oplearn.project.dto.request.UserRequest;
 import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.user.UserFilterResponse;
+import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.dto.response.user.UserResponse;
 import org.oplearn.project.entity.user.User;
 
@@ -33,4 +34,6 @@ public interface UserService {
     UserResponse detail(Long id);
 
     public User checkExistById(Long id);
+
+    PageResponse<UserMentionResponse> searchForMention(String keyword, int page, int size);
 }

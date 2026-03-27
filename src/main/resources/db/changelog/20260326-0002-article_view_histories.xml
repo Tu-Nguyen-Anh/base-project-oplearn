@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="create-article-view-histories-table" author="tuna">
+        <createTable tableName="article_view_histories">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="article_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by" type="varchar(255)"/>
+            <column name="last_updated_at" type="bigint"/>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="created_at" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="article_view_histories" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="id"
+                constraintName="fk_article_view_histories_user_id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="article_view_histories" baseColumnNames="article_id"
+                referencedTableName="articles" referencedColumnNames="id"
+                constraintName="fk_article_view_histories_article_id"/>
+
+    </changeSet>
+</databaseChangeLog>

@@ -1,6 +1,7 @@
 package org.oplearn.project.repository;
 
 import org.oplearn.project.dto.response.user.UserFilterResponse;
+import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.entity.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,4 +49,20 @@ public interface UserRepository extends BaseRepository<User> {
             @Param("status") List<Integer> status,
             Pageable pageable
     );
+
+    @Query("""
+            SELECT new org.oplearn.project.dto.response.user.UserMentionResponse(
+                u.id,
+                u.username,
+                u.fullName,
+                u.avatar
+            )
+            FROM User u
+            WHERE u.deleted = false
+              AND (:keyword = '' OR
+                   LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                   LOWER(u.fullName) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            ORDER BY u.fullName ASC
+            """)
+    Page<UserMentionResponse> searchForMention(@Param("keyword") String keyword, Pageable pageable);
 }

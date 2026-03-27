@@ -30,7 +30,8 @@ public class AuthenticateController {
             @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
 
     ) {
-        log.info("=== Start login ");
+        log.info("login request: {}", request.username());
+
         log.debug("(login) request: {}", request);
 
         return ResponseGeneral.ofSuccess(

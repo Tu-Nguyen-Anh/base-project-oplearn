@@ -8,6 +8,21 @@
     <include file="db/changelog/20250403-1136-sources.xml"/>
     <include file="db/changelog/20250503-1136-topic.xml"/>
     <include file="db/changelog/20250603-1136-articles.xml"/>
+    <include file="db/changelog/20260326-0001-user_favorite_articles.xml"/>
+    <include file="db/changelog/20260326-0002-article_view_histories.xml"/>
+    <include file="db/changelog/20260326-0003-article_comments.xml"/>
+    <include file="db/changelog/20260326-0004-comment_mentions.xml"/>
+    <include file="db/changelog/20260326-0005-notifications.xml"/>
+    <include file="db/changelog/20260326-0006-blog_posts.xml"/>
+    <include file="db/changelog/20260326-0007-blog_post_comments.xml"/>
+    <include file="db/changelog/20260326-0008-blog_post_likes.xml"/>
+    <include file="db/changelog/20260326-0009-blog_post_shares.xml"/>
+    <include file="db/changelog/20260327-0001-chat_groups.xml"/>
+    <include file="db/changelog/20260327-0002-chat_group_members.xml"/>
+    <include file="db/changelog/20260327-0003-chat_messages.xml"/>
+    <include file="db/changelog/20260327-0004-chat_group_history.xml"/>
+    <include file="db/changelog/20260327-0005-chat_message_reads.xml"/>
+    <include file="db/changelog/20260327-0006-chat_message_reactions.xml"/>
     <include file="db/data/data.xml"/>
 
 </databaseChangeLog>

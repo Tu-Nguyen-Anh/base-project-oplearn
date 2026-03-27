@@ -1,4 +1,7 @@
 spring:
+  datasource:
+    #    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=news_db}
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/news_db}
   application:
     name: soar
   profiles:
@@ -25,7 +28,7 @@ spring:
           ssl:
             trust: smtp.gmail.com
 server:
-  port: ${PORT_INTERNAL:8888}
+  port: ${PORT_INTERNAL:8188}
 
 logging:
   level:

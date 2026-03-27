@@ -2,11 +2,13 @@ package org.oplearn.project.repository;
 
 import org.oplearn.project.dto.response.article.ArticleFilterResponse;
 import org.oplearn.project.entity.article.Article;
+import org.oplearn.project.repository.projection.MonthlyCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ArticleRepository extends BaseRepository<Article> {
@@ -50,6 +52,32 @@ public interface ArticleRepository extends BaseRepository<Article> {
             @Param("sourceId") Long sourceId,
             Pageable pageable
     );
+
+    @Query(value = """
+            SELECT CAST(EXTRACT(MONTH FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) AS month,
+                   COUNT(*) AS count
+            FROM articles a
+            WHERE CAST(EXTRACT(YEAR FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :year
+              AND a.deleted = false
+            GROUP BY 1
+            ORDER BY 1
+            """, nativeQuery = true)
+    List<MonthlyCountProjection> countArticlesByMonth(@Param("year") int year);
+
+    @Query(value = """
+            SELECT s.id        AS source_id,
+                   s.name      AS source_name,
+                   CAST(EXTRACT(MONTH FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) AS month,
+                   COUNT(*)    AS count
+            FROM articles a
+                     JOIN topics t ON a.topic_id = t.id
+                     JOIN sources s ON t.source_id = s.id
+            WHERE CAST(EXTRACT(YEAR FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :year
+              AND a.deleted = false
+            GROUP BY s.id, s.name, 3
+            ORDER BY s.id, 3
+            """, nativeQuery = true)
+    List<Object[]> countArticlesBySourceAndMonth(@Param("year") int year);
 
     @Query("""
         SELECT new org.oplearn.project.dto.response.article.ArticleFilterResponse(

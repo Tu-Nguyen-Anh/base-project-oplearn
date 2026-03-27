@@ -8,6 +8,8 @@ import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.ResponseGeneral;
 import org.oplearn.project.dto.response.article.ArticleFilterResponse;
 import org.oplearn.project.dto.response.article.ArticleResponse;
+import org.oplearn.project.dto.response.article.ArticleViewHistoryResponse;
+import org.oplearn.project.dto.response.article.FavoriteArticleResponse;
 import org.oplearn.project.facade.ArticleFacadeService;
 import org.oplearn.project.service.ArticleService;
 import org.oplearn.project.service.base.MessageService;
@@ -107,6 +109,76 @@ public class ArticleController {
         return ResponseGeneral.ofSuccess(
                 messageService.getMessage(SUCCESS, language),
                 articleFacadeService.filter(articleFilterRequest));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{articleId}/favorites")
+    public ResponseGeneral<Void> addFavorite(
+            @PathVariable Long articleId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(addFavorite) articleId: {}", articleId);
+
+        articleFacadeService.addFavorite(articleId);
+
+        return ResponseGeneral.ofCreated(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @DeleteMapping("/{articleId}/favorites")
+    public ResponseGeneral<Void> removeFavorite(
+            @PathVariable Long articleId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(removeFavorite) articleId: {}", articleId);
+
+        articleFacadeService.removeFavorite(articleId);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @GetMapping("/favorites")
+    public ResponseGeneral<PageResponse<FavoriteArticleResponse>> getFavorites(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(getFavorites) page: {}, size: {}", page, size);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                articleFacadeService.getFavorites(page, size));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{articleId}/view")
+    public ResponseGeneral<Void> viewArticle(
+            @PathVariable Long articleId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(viewArticle) articleId: {}", articleId);
+
+        articleFacadeService.viewArticle(articleId);
+
+        return ResponseGeneral.ofCreated(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @GetMapping("/view-history")
+    public ResponseGeneral<PageResponse<ArticleViewHistoryResponse>> getViewHistory(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(getViewHistory) page: {}, size: {}", page, size);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                articleFacadeService.getViewHistory(page, size));
     }
 }
 

@@ -10,6 +10,7 @@ import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.ResponseGeneral;
 import org.oplearn.project.dto.response.user.UserFilterResponse;
 import org.oplearn.project.dto.response.user.UserHistoryResponse;
+import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.dto.response.user.UserResponse;
 import org.oplearn.project.facade.UserFacadeService;
 import org.oplearn.project.service.UserService;
@@ -167,6 +168,21 @@ public class UserController {
 
         return ResponseGeneral.ofSuccess(
                 messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @GetMapping("/mention-search")
+    public ResponseGeneral<PageResponse<UserMentionResponse>> mentionSearch(
+            @RequestParam(name = "keyword", defaultValue = "") String keyword,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(mentionSearch) keyword: {}", keyword);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                userService.searchForMention(keyword, page, size)
         );
     }
 
