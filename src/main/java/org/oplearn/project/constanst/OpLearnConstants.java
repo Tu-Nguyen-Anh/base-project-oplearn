@@ -116,10 +116,18 @@ public class OpLearnConstants {
         public static final String ROLE_MEMBER = "MEMBER";
         public static final String MESSAGE_TYPE_TEXT = "TEXT";
         public static final String MESSAGE_TYPE_IMAGE = "IMAGE";
+        public static final String MESSAGE_TYPE_EMOJI = "EMOJI";
         public static final String WEBSOCKET_ENDPOINT = "/ws";
         public static final String TOPIC_PREFIX = "/topic";
         public static final String APP_PREFIX = "/app";
         public static final String CHAT_TOPIC = "/topic/chat/";
+    }
+
+    public static final class NotificationConstants {
+        private NotificationConstants() {
+        }
+
+        public static final String NOTIFICATION_TOPIC = "/topic/notifications/%d";
     }
 
     public static final class ChatHistoryAction {
@@ -130,6 +138,7 @@ public class OpLearnConstants {
         public static final String RENAME_GROUP = "RENAME_GROUP";
         public static final String ADD_MEMBER = "ADD_MEMBER";
         public static final String REMOVE_MEMBER = "REMOVE_MEMBER";
+        public static final String LEAVE_GROUP = "LEAVE_GROUP";
     }
 
     public static final class ChatException {
@@ -143,6 +152,8 @@ public class OpLearnConstants {
         public static final String CHAT_MESSAGE_NOT_FOUND = "org.oplearn.project.exception.base.chat.ChatMessageNotFoundException";
         public static final String REACTION_ALREADY_EXISTS = "org.oplearn.project.exception.base.chat.ReactionAlreadyExistsException";
         public static final String REACTION_NOT_FOUND = "org.oplearn.project.exception.base.chat.ReactionNotFoundException";
+        public static final String CANNOT_LEAVE_GROUP = "org.oplearn.project.exception.base.chat.CannotLeaveGroupException";
+        public static final String NOT_MESSAGE_SENDER = "org.oplearn.project.exception.base.chat.NotMessageSenderException";
     }
 
     public static final class ChatPresence {
@@ -155,6 +166,7 @@ public class OpLearnConstants {
         public static final String PRESENCE_TOPIC = "/topic/chat/%s/presence";
         public static final String READ_RECEIPT_TOPIC = "/topic/chat/%s/read";
         public static final String REACTION_TOPIC = "/topic/chat/%s/reaction";
+        public static final String RECALL_TOPIC = "/topic/chat/%s/recall";
         public static final String REACTION_ADD = "ADD";
         public static final String REACTION_REMOVE = "REMOVE";
     }

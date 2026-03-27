@@ -85,4 +85,9 @@ public class ChatGroupMemberServiceImpl implements ChatGroupMemberService {
     public int countMembers(Long groupId) {
         return chatGroupMemberRepository.countByGroupIdAndDeletedFalse(groupId);
     }
+
+    @Override
+    public int countAdmins(Long groupId) {
+        return chatGroupMemberRepository.countByGroupIdAndRoleAndDeletedFalse(groupId, ROLE_ADMIN);
+    }
 }

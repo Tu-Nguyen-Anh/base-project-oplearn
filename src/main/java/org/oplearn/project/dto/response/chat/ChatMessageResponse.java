@@ -25,6 +25,7 @@ public class ChatMessageResponse {
     private String senderAvatar;
     private String content;
     private String messageType;
+    private Boolean recalled;
     private Long createdAt;
     private List<ReaderResponse> readers;
     private List<ReactionResponse> reactions;

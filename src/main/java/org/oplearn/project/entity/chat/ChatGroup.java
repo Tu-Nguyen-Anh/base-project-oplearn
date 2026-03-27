@@ -18,4 +18,5 @@ public class ChatGroup extends AuditEntity {
     private String name;
     private String avatar;
     private Boolean deleted;
+    private Boolean isDirect;
 }

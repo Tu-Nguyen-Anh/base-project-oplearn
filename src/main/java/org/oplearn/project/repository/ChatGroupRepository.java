@@ -19,4 +19,13 @@ public interface ChatGroupRepository extends BaseRepository<ChatGroup> {
             ORDER BY g.createdAt DESC
             """)
     List<ChatGroup> findAllGroupsByUserId(@Param("userId") Long userId);
+
+    @Query("""
+            SELECT g FROM ChatGroup g
+            WHERE g.isDirect = true AND g.deleted = false
+            AND EXISTS (SELECT m FROM ChatGroupMember m WHERE m.groupId = g.id AND m.userId = :userId1 AND m.deleted = false)
+            AND EXISTS (SELECT m FROM ChatGroupMember m WHERE m.groupId = g.id AND m.userId = :userId2 AND m.deleted = false)
+            AND (SELECT COUNT(m) FROM ChatGroupMember m WHERE m.groupId = g.id AND m.deleted = false) = 2
+            """)
+    Optional<ChatGroup> findDirectGroup(@Param("userId1") Long userId1, @Param("userId2") Long userId2);
 }

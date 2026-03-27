@@ -1,6 +1,5 @@
 package org.oplearn.project.dto.response.chat;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
@@ -13,13 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class GroupResponse {
-    private Long id;
-    private String name;
-    private String avatar;
-    private int memberCount;
-    private String myRole;
-    private Boolean isDirect;
-    private Long createdAt;
+public class RecallEvent {
+    private Long messageId;
+    private Long groupId;
+    private Long recalledBy;
+    private Long recalledAt;
 }

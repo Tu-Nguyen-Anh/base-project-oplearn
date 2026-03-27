@@ -15,4 +15,6 @@ public interface ChatGroupMemberRepository extends BaseRepository<ChatGroupMembe
     boolean existsByGroupIdAndUserIdAndDeletedFalse(Long groupId, Long userId);
 
     int countByGroupIdAndDeletedFalse(Long groupId);
+
+    int countByGroupIdAndRoleAndDeletedFalse(Long groupId, String role);
 }

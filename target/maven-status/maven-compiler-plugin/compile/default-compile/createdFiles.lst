@@ -13,7 +13,9 @@ org/oplearn/project/configuration/AopConfiguration.class
 org/oplearn/project/controller/advice/ExceptionHandlerAdvice.class
 org/oplearn/project/service/ChatGroupService.class
 org/oplearn/project/dto/response/chat/GroupDetailResponse.class
+org/oplearn/project/exception/base/chat/NotMessageSenderException.class
 org/oplearn/project/dto/response/chat/ReadReceiptEvent$ReadReceiptEventBuilder.class
+org/oplearn/project/exception/base/chat/CannotLeaveGroupException.class
 org/oplearn/project/entity/chat/ChatMessageRead$ChatMessageReadBuilder.class
 org/oplearn/project/dto/request/SourceFilterRequest.class
 org/oplearn/project/constanst/OpLearnConstants$AuditorConstant.class
@@ -105,6 +107,7 @@ org/oplearn/project/annotation/PhoneNumberValidation.class
 org/oplearn/project/service/impl/ChatGroupMemberServiceImpl.class
 org/oplearn/project/repository/ChatMessageReadRepository.class
 org/oplearn/project/dto/request/authenticate/LoginRequest.class
+org/oplearn/project/dto/response/chat/RecallEvent$RecallEventBuilder.class
 org/oplearn/project/facade/impl/AuthenticateFacadeServiceImpl.class
 org/oplearn/project/service/impl/ChatGroupServiceImpl.class
 org/oplearn/project/dto/response/chat/ChatMessageResponse$ChatMessageResponseBuilder.class
@@ -130,6 +133,7 @@ org/oplearn/project/exception/base/auth/UsernameOrEmailInvalidException.class
 org/oplearn/project/dto/response/chat/ReaderResponse.class
 org/oplearn/project/utils/StringUtils.class
 org/oplearn/project/dto/response/chat/PresenceEvent$PresenceEventBuilder.class
+org/oplearn/project/dto/response/chat/RecallEvent.class
 org/oplearn/project/dto/response/chat/ReactionResponse$ReactorInfo.class
 org/oplearn/project/facade/impl/ChatGroupFacadeServiceImpl.class
 org/oplearn/project/dto/response/Error.class

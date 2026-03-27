@@ -24,4 +24,5 @@ public class ChatMessage extends AuditEntity {
 
     private String messageType;
     private Boolean deleted;
+    private Boolean recalled;
 }

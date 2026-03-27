@@ -17,10 +17,12 @@ import org.oplearn.project.dto.response.chat.ReactionEvent;
 import org.oplearn.project.dto.response.chat.ReactionResponse;
 import org.oplearn.project.dto.response.chat.ReadReceiptEvent;
 import org.oplearn.project.dto.response.chat.ReaderResponse;
+import org.oplearn.project.dto.response.chat.RecallEvent;
 import org.oplearn.project.entity.chat.ChatGroup;
 import org.oplearn.project.entity.chat.ChatGroupMember;
 import org.oplearn.project.entity.chat.ChatMessage;
 import org.oplearn.project.entity.user.User;
+import org.oplearn.project.exception.base.chat.CannotLeaveGroupException;
 import org.oplearn.project.exception.base.chat.NotGroupAdminException;
 import org.oplearn.project.exception.base.chat.NotGroupMemberException;
 import org.oplearn.project.facade.ChatGroupFacadeService;
@@ -47,12 +49,14 @@ import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.ROLE_
 import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.ROLE_MEMBER;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatHistoryAction.ADD_MEMBER;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatHistoryAction.CREATE_GROUP;
+import static org.oplearn.project.constanst.OpLearnConstants.ChatHistoryAction.LEAVE_GROUP;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatHistoryAction.REMOVE_MEMBER;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatHistoryAction.RENAME_GROUP;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatPresence.REACTION_ADD;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatPresence.REACTION_REMOVE;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatPresence.REACTION_TOPIC;
 import static org.oplearn.project.constanst.OpLearnConstants.ChatPresence.READ_RECEIPT_TOPIC;
+import static org.oplearn.project.constanst.OpLearnConstants.ChatPresence.RECALL_TOPIC;
 
 @Slf4j
 @Service
@@ -88,6 +92,50 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
 
         int memberCount = chatGroupMemberService.countMembers(group.getId());
         return mapToGroupResponse(group, ROLE_ADMIN, memberCount);
+    }
+
+    @Transactional
+    @Override
+    public GroupResponse getOrCreateDirectMessage(Long targetUserId) {
+        User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
+        userService.checkExistById(targetUserId);
+
+        return chatGroupService.findDirectGroup(currentUser.getId(), targetUserId)
+                .map(existing -> {
+                    int memberCount = chatGroupMemberService.countMembers(existing.getId());
+                    return mapToGroupResponse(existing, ROLE_MEMBER, memberCount);
+                })
+                .orElseGet(() -> {
+                    ChatGroup group = chatGroupService.createDirect();
+                    chatGroupMemberService.addMember(group.getId(), currentUser.getId(), ROLE_ADMIN);
+                    chatGroupMemberService.addMember(group.getId(), targetUserId, ROLE_ADMIN);
+                    return mapToGroupResponse(group, ROLE_ADMIN, 2);
+                });
+    }
+
+    @Transactional
+    @Override
+    public void leaveGroup(Long groupId) {
+        User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
+        if (!chatGroupMemberService.isMember(groupId, currentUser.getId())) {
+            throw new NotGroupMemberException();
+        }
+
+        int totalMembers = chatGroupMemberService.countMembers(groupId);
+        boolean isAdmin = chatGroupMemberService.isAdmin(groupId, currentUser.getId());
+        int adminCount = chatGroupMemberService.countAdmins(groupId);
+
+        if (isAdmin && adminCount == 1 && totalMembers > 1) {
+            throw new CannotLeaveGroupException();
+        }
+
+        chatGroupMemberService.removeMember(groupId, currentUser.getId());
+        chatGroupHistoryService.saveHistory(groupId, LEAVE_GROUP,
+                String.format("%s đã rời khỏi nhóm", currentUser.getFullName()));
+
+        if (totalMembers == 1) {
+            chatGroupService.delete(groupId);
+        }
     }
 
     @Override
@@ -207,8 +255,17 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
     @Override
     public void deleteGroup(Long groupId) {
         User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
-        if (!chatGroupMemberService.isAdmin(groupId, currentUser.getId())) {
-            throw new NotGroupAdminException();
+        ChatGroup group = chatGroupService.getById(groupId);
+
+        boolean isDirect = Boolean.TRUE.equals(group.getIsDirect());
+        if (isDirect) {
+            if (!chatGroupMemberService.isMember(groupId, currentUser.getId())) {
+                throw new NotGroupMemberException();
+            }
+        } else {
+            if (!chatGroupMemberService.isAdmin(groupId, currentUser.getId())) {
+                throw new NotGroupAdminException();
+            }
         }
         chatGroupService.delete(groupId);
     }
@@ -227,6 +284,27 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         ChatMessageResponse response = buildMessageResponse(message, currentUser, List.of(), List.of());
         messagingTemplate.convertAndSend(CHAT_TOPIC + groupId, response);
         return response;
+    }
+
+    @Transactional
+    @Override
+    public ChatMessageResponse recallMessage(Long groupId, Long messageId) {
+        User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
+        if (!chatGroupMemberService.isMember(groupId, currentUser.getId())) {
+            throw new NotGroupMemberException();
+        }
+
+        ChatMessage message = chatMessageService.recallMessage(messageId, currentUser.getId());
+
+        RecallEvent event = RecallEvent.builder()
+                .messageId(messageId)
+                .groupId(groupId)
+                .recalledBy(currentUser.getId())
+                .recalledAt(System.currentTimeMillis())
+                .build();
+        messagingTemplate.convertAndSend(String.format(RECALL_TOPIC, groupId), event);
+
+        return buildMessageResponse(message, currentUser, List.of(), List.of());
     }
 
     @Override
@@ -395,6 +473,7 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
                 .avatar(group.getAvatar())
                 .myRole(myRole)
                 .memberCount(memberCount)
+                .isDirect(group.getIsDirect())
                 .createdAt(group.getCreatedAt())
                 .build();
     }
@@ -415,6 +494,7 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
     private ChatMessageResponse buildMessageResponse(ChatMessage message, User sender,
                                                       List<ReaderResponse> readers,
                                                       List<ReactionResponse> reactions) {
+        boolean recalled = Boolean.TRUE.equals(message.getRecalled());
         return ChatMessageResponse.builder()
                 .id(message.getId())
                 .groupId(message.getGroupId())
@@ -422,11 +502,12 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
                 .senderUsername(sender.getUsername())
                 .senderFullName(sender.getFullName())
                 .senderAvatar(sender.getAvatar())
-                .content(message.getContent())
-                .messageType(message.getMessageType())
+                .content(recalled ? "Tin nhắn đã bị thu hồi" : message.getContent())
+                .messageType(recalled ? null : message.getMessageType())
+                .recalled(recalled)
                 .createdAt(message.getCreatedAt())
-                .readers(readers.isEmpty() ? null : readers)
-                .reactions(reactions.isEmpty() ? null : reactions)
+                .readers(recalled || readers.isEmpty() ? null : readers)
+                .reactions(recalled || reactions.isEmpty() ? null : reactions)
                 .build();
     }
 }

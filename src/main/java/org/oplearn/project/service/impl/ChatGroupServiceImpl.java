@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -25,8 +26,24 @@ public class ChatGroupServiceImpl implements ChatGroupService {
                 .name(name)
                 .avatar(avatar)
                 .deleted(false)
+                .isDirect(false)
                 .build();
         return chatGroupRepository.save(group);
+    }
+
+    @Transactional
+    @Override
+    public ChatGroup createDirect() {
+        ChatGroup group = ChatGroup.builder()
+                .deleted(false)
+                .isDirect(true)
+                .build();
+        return chatGroupRepository.save(group);
+    }
+
+    @Override
+    public Optional<ChatGroup> findDirectGroup(Long userId1, Long userId2) {
+        return chatGroupRepository.findDirectGroup(userId1, userId2);
     }
 
     @Override

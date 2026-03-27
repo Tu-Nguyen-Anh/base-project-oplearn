@@ -24,5 +24,3 @@ logging:
   level:
     org.hibernate.SQL: OFF
     org.hibernate.type.descriptor.sql: OFF
-cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:https://soar-fe.lab.ncc.local}

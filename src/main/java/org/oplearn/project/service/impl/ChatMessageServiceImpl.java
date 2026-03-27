@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.oplearn.project.entity.chat.ChatMessage;
 import org.oplearn.project.exception.base.chat.ChatMessageNotFoundException;
+import org.oplearn.project.exception.base.chat.NotMessageSenderException;
 import org.oplearn.project.repository.ChatMessageRepository;
 import org.oplearn.project.service.ChatMessageService;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,19 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public ChatMessage getById(Long messageId) {
         return chatMessageRepository.findByIdAndDeletedFalse(messageId)
                 .orElseThrow(ChatMessageNotFoundException::new);
+    }
+
+    @Transactional
+    @Override
+    public ChatMessage recallMessage(Long messageId, Long requesterId) {
+        ChatMessage message = chatMessageRepository.findByIdAndDeletedFalse(messageId)
+                .orElseThrow(ChatMessageNotFoundException::new);
+        if (!message.getSenderId().equals(requesterId)) {
+            throw new NotMessageSenderException();
+        }
+        chatMessageRepository.recallById(messageId);
+        message.setRecalled(true);
+        return message;
     }
 
     @Override

@@ -20,4 +20,6 @@ public interface ChatGroupMemberService {
     boolean isAdmin(Long groupId, Long userId);
 
     int countMembers(Long groupId);
+
+    int countAdmins(Long groupId);
 }

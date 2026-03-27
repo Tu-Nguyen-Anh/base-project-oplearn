@@ -11,9 +11,11 @@ import org.oplearn.project.service.NotificationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.oplearn.project.constanst.OpLearnConstants.NotificationConstants.NOTIFICATION_TOPIC;
 import static org.oplearn.project.constanst.OpLearnConstants.NotificationType.MENTION_IN_COMMENT;
 
 @Slf4j
@@ -21,6 +23,7 @@ import static org.oplearn.project.constanst.OpLearnConstants.NotificationType.ME
 @RequiredArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository repository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     @Transactional
     @Override
@@ -40,7 +43,18 @@ public class NotificationServiceImpl implements NotificationService {
                 .isRead(false)
                 .build();
 
-        repository.save(notification);
+        Notification saved = repository.save(notification);
+
+        NotificationResponse payload = new NotificationResponse(
+                saved.getId(), senderUserId, senderFullName,
+                MENTION_IN_COMMENT,
+                saved.getMessage(),
+                articleId, commentId,
+                false, saved.getCreatedAt()
+        );
+        String topic = String.format(NOTIFICATION_TOPIC, recipientUserId);
+        messagingTemplate.convertAndSend(topic, payload);
+        log.debug("(createMentionNotification) pushed WebSocket notification to topic: {}", topic);
     }
 
     @Override

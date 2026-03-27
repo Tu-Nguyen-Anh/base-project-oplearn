@@ -19,6 +19,10 @@ import java.util.List;
 public interface ChatGroupFacadeService {
     GroupResponse createGroup(CreateGroupRequest request);
 
+    GroupResponse getOrCreateDirectMessage(Long targetUserId);
+
+    void leaveGroup(Long groupId);
+
     List<GroupResponse> getMyGroups();
 
     GroupDetailResponse getGroupDetail(Long groupId);
@@ -34,6 +38,8 @@ public interface ChatGroupFacadeService {
     void deleteGroup(Long groupId);
 
     ChatMessageResponse sendMessage(Long groupId, SendMessageRequest request);
+
+    ChatMessageResponse recallMessage(Long groupId, Long messageId);
 
     PageResponse<ChatMessageResponse> getMessages(Long groupId, int page, int size);
 

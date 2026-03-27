@@ -38,6 +38,28 @@ public class ChatGroupController {
     private final ChatGroupFacadeService chatGroupFacadeService;
     private final MessageService messageService;
 
+    @PostMapping("/direct/{targetUserId}")
+    public ResponseGeneral<GroupResponse> getOrCreateDirectMessage(
+            @PathVariable Long targetUserId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(getOrCreateDirectMessage) targetUserId: {}", targetUserId);
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                chatGroupFacadeService.getOrCreateDirectMessage(targetUserId)
+        );
+    }
+
+    @DeleteMapping("/{groupId}/leave")
+    public ResponseGeneral<Void> leaveGroup(
+            @PathVariable Long groupId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(leaveGroup) groupId: {}", groupId);
+        chatGroupFacadeService.leaveGroup(groupId);
+        return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language));
+    }
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseGeneral<GroupResponse> createGroup(
@@ -216,6 +238,19 @@ public class ChatGroupController {
         log.info("(heartbeat)");
         chatGroupFacadeService.heartbeat();
         return ResponseGeneral.ofSuccess(messageService.getMessage(SUCCESS, language));
+    }
+
+    @DeleteMapping("/{groupId}/messages/{messageId}/recall")
+    public ResponseGeneral<ChatMessageResponse> recallMessage(
+            @PathVariable Long groupId,
+            @PathVariable Long messageId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(recallMessage) groupId: {}, messageId: {}", groupId, messageId);
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                chatGroupFacadeService.recallMessage(groupId, messageId)
+        );
     }
 
     @GetMapping("/{groupId}/messages")

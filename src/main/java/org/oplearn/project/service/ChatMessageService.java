@@ -10,6 +10,8 @@ public interface ChatMessageService {
 
     ChatMessage getById(Long messageId);
 
+    ChatMessage recallMessage(Long messageId, Long requesterId);
+
     Page<ChatMessage> getMessages(Long groupId, int page, int size);
 
     List<Long> getMessageIdsByGroupId(Long groupId);
