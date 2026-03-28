@@ -16,6 +16,7 @@ import org.oplearn.project.entity.base.AuditEntity;
 @Entity
 @Table(name = "chat_messages")
 public class ChatMessage extends AuditEntity {
+
     private Long groupId;
     private Long senderId;
 
@@ -23,6 +24,11 @@ public class ChatMessage extends AuditEntity {
     private String content;
 
     private String messageType;
-    private Boolean deleted;
-    private Boolean recalled;
+
+    @Builder.Default
+    private Boolean deleted = false;
+
+    @Builder.Default
+    @Column(name = "recalled", nullable = false)
+    private Boolean recalled = false;
 }
