@@ -2,6 +2,7 @@ package org.oplearn.project.repository;
 
 import org.oplearn.project.dto.response.article.ArticleFilterResponse;
 import org.oplearn.project.entity.article.Article;
+import org.oplearn.project.repository.projection.DailyCountProjection;
 import org.oplearn.project.repository.projection.MonthlyCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -63,6 +64,18 @@ public interface ArticleRepository extends BaseRepository<Article> {
             ORDER BY 1
             """, nativeQuery = true)
     List<MonthlyCountProjection> countArticlesByMonth(@Param("year") int year);
+
+    @Query(value = """
+            SELECT CAST(EXTRACT(DAY FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) AS day,
+                   COUNT(*) AS count
+            FROM articles a
+            WHERE CAST(EXTRACT(YEAR FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :year
+              AND CAST(EXTRACT(MONTH FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :month
+              AND a.deleted = false
+            GROUP BY 1
+            ORDER BY 1
+            """, nativeQuery = true)
+    List<DailyCountProjection> countArticlesByDay(@Param("year") int year, @Param("month") int month);
 
     @Query(value = """
             SELECT s.id        AS source_id,

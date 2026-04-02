@@ -3,6 +3,7 @@ package org.oplearn.project.facade.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.oplearn.project.dto.response.dashboard.ArticleBySourceResponse;
+import org.oplearn.project.dto.response.dashboard.ArticleDailyResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleGrowthResponse;
 import org.oplearn.project.facade.DashboardFacadeService;
 import org.oplearn.project.service.DashboardService;
@@ -31,5 +32,15 @@ public class DashboardFacadeServiceImpl implements DashboardFacadeService {
         int resolvedYear = (year != null) ? year : LocalDate.now().getYear();
         log.debug("(getArticleCountBySource) year: {}", resolvedYear);
         return dashboardService.getArticleCountBySource(resolvedYear);
+    }
+
+    @Override
+    public ArticleDailyResponse getArticleDailyCount(Integer year, Integer month) {
+        log.info("=== Start getArticleDailyCount");
+        LocalDate now = LocalDate.now();
+        int resolvedYear = (year != null) ? year : now.getYear();
+        int resolvedMonth = (month != null) ? month : now.getMonthValue();
+        log.debug("(getArticleDailyCount) year: {}, month: {}", resolvedYear, resolvedMonth);
+        return dashboardService.getArticleDailyCount(resolvedYear, resolvedMonth);
     }
 }

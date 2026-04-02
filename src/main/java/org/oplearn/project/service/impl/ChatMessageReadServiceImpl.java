@@ -12,9 +12,10 @@ import org.oplearn.project.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,33 +29,29 @@ public class ChatMessageReadServiceImpl implements ChatMessageReadService {
 
     @Transactional
     @Override
-    public long markAllAsRead(Long groupId, Long userId) {
+    public Optional<Long> markAllAsRead(Long groupId, Long userId) {
         List<Long> allMessageIds = chatMessageService.getMessageIdsByGroupId(groupId);
         if (allMessageIds.isEmpty()) {
-            return 0L;
+            return Optional.empty();
         }
+
+        Set<Long> alreadyReadIds = chatMessageReadRepository.findAlreadyReadMessageIds(allMessageIds, userId);
 
         long now = System.currentTimeMillis();
-        List<ChatMessageRead> toSave = new ArrayList<>();
-
-        for (Long messageId : allMessageIds) {
-            if (!chatMessageReadRepository.existsByMessageIdAndUserId(messageId, userId)) {
-                toSave.add(ChatMessageRead.builder()
-                        .messageId(messageId)
+        List<ChatMessageRead> toSave = allMessageIds.stream()
+                .filter(id -> !alreadyReadIds.contains(id))
+                .map(id -> ChatMessageRead.builder()
+                        .messageId(id)
                         .userId(userId)
                         .readAt(now)
-                        .build());
-            }
-        }
+                        .build())
+                .collect(Collectors.toList());
 
         if (!toSave.isEmpty()) {
             chatMessageReadRepository.saveAll(toSave);
         }
 
-        return allMessageIds.stream()
-                .filter(id -> toSave.stream().anyMatch(r -> r.getMessageId().equals(id))
-                        || chatMessageReadRepository.existsByMessageIdAndUserId(id, userId))
-                .count();
+        return allMessageIds.stream().max(Long::compareTo);
     }
 
     @Override

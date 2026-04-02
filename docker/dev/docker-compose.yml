@@ -11,8 +11,17 @@ services:
       - "54123:5432"
     volumes:
       - postgres_news_data:/var/lib/postgresql/data
+    shm_size: 256m
     networks:
       - news_network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
 
   redis_news:
     image: redis:6.2-alpine
@@ -20,13 +29,17 @@ services:
     restart: unless-stopped
     ports:
       - "6380:6379"
-    command: redis-server --save 20 1 --loglevel warning
+    command: redis-server --save 20 1 --loglevel warning --maxmemory 400mb --maxmemory-policy allkeys-lru
+    networks:
+      - news_network
     deploy:
       resources:
         limits:
+          cpus: '0.5'
           memory: 512M
-    networks:
-      - news_network
+        reservations:
+          cpus: '0.1'
+          memory: 128M
 
   news:
     build:
@@ -42,8 +55,18 @@ services:
       - "8188:8188"
     env_file:
       - .env
+    environment:
+      JAVA_OPTS: "-Xms512m -Xmx4g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -XX:+UseG1GC"
     networks:
       - news_network
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 6G
+        reservations:
+          cpus: '0.5'
+          memory: 1536M
 
 volumes:
   postgres_news_data:

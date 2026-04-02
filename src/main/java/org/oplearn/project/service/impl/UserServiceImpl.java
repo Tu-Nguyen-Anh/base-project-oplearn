@@ -21,7 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static org.oplearn.project.constanst.OpLearnConstants.AuditorConstant.ADMIN;
 import static org.oplearn.project.utils.PasswordEncoderUtils.getPasswordEncoder;
@@ -38,6 +40,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long userId) {
         return repository.getByIdAndDeletedFalse(userId);
+    }
+
+    @Override
+    public List<User> getByIds(Set<Long> ids) {
+        return repository.findAllById(ids);
     }
 
     @Override

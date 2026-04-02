@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.oplearn.project.dto.response.ResponseGeneral;
 import org.oplearn.project.dto.response.dashboard.ArticleBySourceResponse;
+import org.oplearn.project.dto.response.dashboard.ArticleDailyResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleGrowthResponse;
 import org.oplearn.project.facade.DashboardFacadeService;
 import org.oplearn.project.service.base.MessageService;
@@ -36,6 +37,20 @@ public class DashboardController {
         return ResponseGeneral.ofSuccess(
                 messageService.getMessage(SUCCESS, language),
                 dashboardFacadeService.getArticleGrowthByMonth(year)
+        );
+    }
+
+    @GetMapping("/articles/daily")
+    public ResponseGeneral<ArticleDailyResponse> getArticleDailyCount(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(getArticleDailyCount) year: {}, month: {}", year, month);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                dashboardFacadeService.getArticleDailyCount(year, month)
         );
     }
 

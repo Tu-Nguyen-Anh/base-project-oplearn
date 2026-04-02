@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.CHAT_TOPIC;
@@ -322,13 +323,14 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         Map<Long, List<ReactionResponse>> reactionsMap =
                 chatMessageReactionService.getReactionsForMessages(messageIds, currentUser.getId());
 
+        Set<Long> senderIds = messages.stream().map(ChatMessage::getSenderId).collect(Collectors.toSet());
+        Map<Long, User> senderMap = userService.getByIds(senderIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
         List<ChatMessageResponse> responses = messages.stream()
-                .map(msg -> {
-                    User sender = userService.getById(msg.getSenderId());
-                    return buildMessageResponse(msg, sender,
-                            readersMap.getOrDefault(msg.getId(), List.of()),
-                            reactionsMap.getOrDefault(msg.getId(), List.of()));
-                })
+                .map(msg -> buildMessageResponse(msg, senderMap.get(msg.getSenderId()),
+                        readersMap.getOrDefault(msg.getId(), List.of()),
+                        reactionsMap.getOrDefault(msg.getId(), List.of())))
                 .toList();
 
         return PageResponse.of(responses, (int) messagePage.getTotalElements());
@@ -351,19 +353,15 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
             throw new NotGroupMemberException();
         }
 
-        List<Long> messageIds = chatMessageService.getMessageIdsByGroupId(groupId);
-        if (messageIds.isEmpty()) return;
-
-        chatMessageReadService.markAllAsRead(groupId, currentUser.getId());
-
-        Long lastMessageId = messageIds.stream().max(Long::compareTo).orElse(null);
+        var lastMessageId = chatMessageReadService.markAllAsRead(groupId, currentUser.getId());
+        if (lastMessageId.isEmpty()) return;
 
         ReadReceiptEvent event = ReadReceiptEvent.builder()
                 .userId(currentUser.getId())
                 .username(currentUser.getUsername())
                 .fullName(currentUser.getFullName())
                 .avatar(currentUser.getAvatar())
-                .lastReadMessageId(lastMessageId)
+                .lastReadMessageId(lastMessageId.get())
                 .readAt(System.currentTimeMillis())
                 .build();
 

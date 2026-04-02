@@ -3,13 +3,16 @@ package org.oplearn.project.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.oplearn.project.dto.response.dashboard.ArticleBySourceResponse;
+import org.oplearn.project.dto.response.dashboard.ArticleDailyResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleGrowthResponse;
 import org.oplearn.project.repository.ArticleRepository;
+import org.oplearn.project.repository.projection.DailyCountProjection;
 import org.oplearn.project.repository.projection.MonthlyCountProjection;
 import org.oplearn.project.service.DashboardService;
 import org.springframework.stereotype.Service;
 
 import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,6 +97,34 @@ public class DashboardServiceImpl implements DashboardService {
         return ArticleBySourceResponse.builder()
                 .year(year)
                 .sources(sources)
+                .build();
+    }
+
+    @Override
+    public ArticleDailyResponse getArticleDailyCount(int year, int month) {
+        log.debug("(getArticleDailyCount) year: {}, month: {}", year, month);
+
+        List<DailyCountProjection> rawData = articleRepository.countArticlesByDay(year, month);
+        Map<Integer, Long> dayCountMap = rawData.stream()
+                .collect(Collectors.toMap(DailyCountProjection::getDay, DailyCountProjection::getCount));
+
+        int totalDays = YearMonth.of(year, month).lengthOfMonth();
+
+        List<ArticleDailyResponse.DailyCount> days = IntStream.rangeClosed(1, totalDays)
+                .mapToObj(d -> ArticleDailyResponse.DailyCount.builder()
+                        .day(d)
+                        .count(dayCountMap.getOrDefault(d, 0L))
+                        .build())
+                .collect(Collectors.toList());
+
+        long total = days.stream().mapToLong(ArticleDailyResponse.DailyCount::getCount).sum();
+
+        return ArticleDailyResponse.builder()
+                .year(year)
+                .month(month)
+                .totalDays(totalDays)
+                .days(days)
+                .total(total)
                 .build();
     }
 }

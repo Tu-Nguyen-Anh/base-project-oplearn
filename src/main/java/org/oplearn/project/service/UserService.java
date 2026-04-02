@@ -8,8 +8,13 @@ import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.dto.response.user.UserResponse;
 import org.oplearn.project.entity.user.User;
 
+import java.util.List;
+import java.util.Set;
+
 public interface UserService {
     User getById(Long userId);
+
+    List<User> getByIds(Set<Long> ids);
 
     User findByUsername(String userName);
 
