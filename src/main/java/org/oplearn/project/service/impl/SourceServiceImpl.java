@@ -15,6 +15,7 @@ import org.oplearn.project.exception.base.source.NameAlreadyExistedException;
 import org.oplearn.project.exception.base.source.UrlAlreadyExistedException;
 import org.oplearn.project.repository.SourceRepository;
 import org.oplearn.project.repository.TopicRepository;
+import org.oplearn.project.repository.UserFollowTopicRepository;
 import org.oplearn.project.service.SourceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,8 +23,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,10 +34,13 @@ import java.util.stream.Collectors;
 public class SourceServiceImpl implements SourceService {
     private final SourceRepository repository;
     private final TopicRepository topicRepository;
+    private final UserFollowTopicRepository userFollowTopicRepository;
 
-    public SourceServiceImpl(SourceRepository repository, TopicRepository topicRepository) {
+    public SourceServiceImpl(SourceRepository repository, TopicRepository topicRepository,
+                              UserFollowTopicRepository userFollowTopicRepository) {
         this.repository = repository;
         this.topicRepository = topicRepository;
+        this.userFollowTopicRepository = userFollowTopicRepository;
     }
 
     @Override
@@ -211,26 +217,31 @@ public class SourceServiceImpl implements SourceService {
     }
 
     @Override
-    public List<SourceWithTopicsResponse> getAllWithTopics() {
+    public List<SourceWithTopicsResponse> getAllWithTopics(Long userId) {
         log.info("=== Start getAllWithTopics");
-        
+
         List<Source> sources = repository.findAllNotDeleted();
-        
+
+        Set<Long> followedTopicIds = userId != null
+                ? new HashSet<>(userFollowTopicRepository.findFollowedTopicIdsByUserId(userId))
+                : new HashSet<>();
+
         return sources.stream()
-                .map(this::mapToSourceWithTopicsResponse)
+                .map(source -> mapToSourceWithTopicsResponse(source, followedTopicIds))
                 .collect(Collectors.toList());
     }
 
-    private SourceWithTopicsResponse mapToSourceWithTopicsResponse(Source source) {
+    private SourceWithTopicsResponse mapToSourceWithTopicsResponse(Source source, Set<Long> followedTopicIds) {
         List<Topic> topics = topicRepository.findBySourceIdAndDeletedFalse(source.getId());
-        
+
         List<TopicSimpleResponse> topicResponses = topics.stream()
                 .map(topic -> new TopicSimpleResponse(
                         topic.getId(),
                         topic.getName(),
                         topic.getUrl(),
                         topic.getRssUrl(),
-                        topic.getDescription()
+                        topic.getDescription(),
+                        followedTopicIds.contains(topic.getId())
                 ))
                 .collect(Collectors.toList());
 

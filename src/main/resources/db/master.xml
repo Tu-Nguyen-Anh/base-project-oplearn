@@ -25,6 +25,7 @@
     <include file="db/changelog/20260327-0006-chat_message_reactions.xml"/>
     <include file="db/changelog/20260327-0007-chat_groups_add_is_direct.xml"/>
     <include file="db/changelog/20260327-0008-chat_messages_add_recalled.xml"/>
+    <include file="db/changelog/20260409-0001-user_follow_topics.xml"/>
     <include file="db/data/data.xml"/>
 
 </databaseChangeLog>

@@ -31,6 +31,6 @@ public interface SourceService {
 
     Source checkExistById(Long id);
 
-    List<SourceWithTopicsResponse> getAllWithTopics();
+    List<SourceWithTopicsResponse> getAllWithTopics(Long userId);
 }
 

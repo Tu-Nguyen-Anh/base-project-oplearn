@@ -18,6 +18,7 @@ public class TopicSimpleResponse {
     private String url;
     private String rssUrl;
     private String description;
+    private Boolean followed;
 }
 
 

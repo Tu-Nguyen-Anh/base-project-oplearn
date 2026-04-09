@@ -6,6 +6,7 @@ import org.oplearn.project.dto.request.TopicFilterRequest;
 import org.oplearn.project.dto.request.TopicRequest;
 import org.oplearn.project.dto.response.PageResponse;
 import org.oplearn.project.dto.response.ResponseGeneral;
+import org.oplearn.project.dto.response.topic.FollowedTopicResponse;
 import org.oplearn.project.dto.response.topic.TopicFilterResponse;
 import org.oplearn.project.dto.response.topic.TopicResponse;
 import org.oplearn.project.facade.TopicFacadeService;
@@ -121,6 +122,49 @@ public class TopicController {
         return ResponseGeneral.ofSuccess(
                 messageService.getMessage(SUCCESS, language),
                 topicFacadeService.filter(topicFilterRequest));
+    }
+
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/{topicId}/follow")
+    public ResponseGeneral<Void> followTopic(
+            @PathVariable Long topicId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(followTopic) topicId: {}", topicId);
+
+        topicFacadeService.followTopic(topicId);
+
+        return ResponseGeneral.ofCreated(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @DeleteMapping("/{topicId}/follow")
+    public ResponseGeneral<Void> unfollowTopic(
+            @PathVariable Long topicId,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(unfollowTopic) topicId: {}", topicId);
+
+        topicFacadeService.unfollowTopic(topicId);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language)
+        );
+    }
+
+    @GetMapping("/following")
+    public ResponseGeneral<PageResponse<FollowedTopicResponse>> getFollowedTopics(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestHeader(name = LANGUAGE, defaultValue = DEFAULT_LANGUAGE) String language
+    ) {
+        log.info("(getFollowedTopics) page: {}, size: {}", page, size);
+
+        return ResponseGeneral.ofSuccess(
+                messageService.getMessage(SUCCESS, language),
+                topicFacadeService.getFollowedTopics(page, size)
+        );
     }
 }
 

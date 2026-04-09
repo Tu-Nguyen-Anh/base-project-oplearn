@@ -15,6 +15,7 @@ import org.oplearn.project.security.UserAuthenticated;
 import org.oplearn.project.service.ArticleService;
 import org.oplearn.project.service.ArticleViewHistoryService;
 import org.oplearn.project.service.UserFavoriteArticleService;
+import org.oplearn.project.service.UserFollowTopicService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class ArticleFacadeServiceImpl implements ArticleFacadeService {
     private final ArticleService articleService;
     private final UserFavoriteArticleService userFavoriteArticleService;
     private final ArticleViewHistoryService articleViewHistoryService;
+    private final UserFollowTopicService userFollowTopicService;
 
     @Transactional
     @Override
@@ -56,6 +58,11 @@ public class ArticleFacadeServiceImpl implements ArticleFacadeService {
     public PageResponse<ArticleFilterResponse> filter(ArticleFilterRequest request) {
         log.info("=== Start filter");
         log.debug("(filter) request: {}", request);
+
+        if (Boolean.TRUE.equals(request.getFollowedOnly())) {
+            User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
+            request.setFollowedTopicIds(userFollowTopicService.getFollowedTopicIds(currentUser.getId()));
+        }
 
         return articleService.filter(request);
     }

@@ -24,6 +24,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import static org.oplearn.project.utils.DateTimeUtils.*;
@@ -154,6 +156,21 @@ public class ArticleServiceImpl implements ArticleService {
                 toPubDateTimestamp = endOfDay.toInstant().toEpochMilli();
                 log.info("toPubDateTimestamp: {}", toPubDateTimestamp);
             }
+        }
+
+        if (Boolean.TRUE.equals(request.getFollowedOnly())) {
+            List<Long> followedTopicIds = request.getFollowedTopicIds();
+            if (followedTopicIds == null || followedTopicIds.isEmpty()) {
+                return PageResponse.of(Collections.emptyList(), 0);
+            }
+            Page<ArticleFilterResponse> followed = repository.filterByFollowedTopics(
+                    keyword,
+                    followedTopicIds,
+                    fromPubDateTimestamp,
+                    toPubDateTimestamp,
+                    pageable
+            );
+            return PageResponse.of(followed.getContent(), (int) followed.getTotalElements());
         }
 
         Page<ArticleFilterResponse> articles = repository.filter(

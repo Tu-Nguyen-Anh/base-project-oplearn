@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -125,6 +126,42 @@ public interface ArticleRepository extends BaseRepository<Article> {
             @Param("keyword") String keyword,
             @Param("topicId") Long topicId,
             @Param("sourceId") Long sourceId,
+            @Param("fromPubDateTimestamp") Long fromPubDateTimestamp,
+            @Param("toPubDateTimestamp") Long toPubDateTimestamp,
+            Pageable pageable
+    );
+
+    @Query("""
+        SELECT new org.oplearn.project.dto.response.article.ArticleFilterResponse(
+                a.id,
+                a.title,
+                a.link,
+                a.guid,
+                a.description,
+                a.pubDate,
+                a.imageLink,
+                t.id,
+                t.name,
+                a.createdBy,
+                a.createdAt,
+                s.name
+                )
+              FROM Article a
+              LEFT JOIN Topic t ON a.topicId = t.id
+              LEFT JOIN Source s ON t.sourceId = s.id
+              WHERE
+                ( :keyword = '' OR
+                LOWER(a.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR
+                LOWER(a.link) LIKE LOWER(CONCAT('%', :keyword, '%')))
+                AND a.deleted = false
+                AND a.topicId IN :followedTopicIds
+                AND (:fromPubDateTimestamp IS NULL OR a.createdAt >= :fromPubDateTimestamp)
+                AND (:toPubDateTimestamp IS NULL OR a.createdAt <= :toPubDateTimestamp)
+              ORDER BY a.createdAt DESC
+        """)
+    Page<ArticleFilterResponse> filterByFollowedTopics(
+            @Param("keyword") String keyword,
+            @Param("followedTopicIds") Collection<Long> followedTopicIds,
             @Param("fromPubDateTimestamp") Long fromPubDateTimestamp,
             @Param("toPubDateTimestamp") Long toPubDateTimestamp,
             Pageable pageable

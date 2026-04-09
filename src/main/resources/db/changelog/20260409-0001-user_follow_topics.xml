@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
+
+    <changeSet id="create-user-follow-topics-table" author="tuna">
+        <createTable tableName="user_follow_topics">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted" type="BOOLEAN" defaultValue="false"/>
+            <column name="last_updated_by" type="varchar(255)"/>
+            <column name="last_updated_at" type="bigint"/>
+            <column name="created_by" type="varchar(255)"/>
+            <column name="created_at" type="bigint"/>
+        </createTable>
+
+        <addForeignKeyConstraint
+                baseTableName="user_follow_topics" baseColumnNames="user_id"
+                referencedTableName="users" referencedColumnNames="id"
+                constraintName="fk_user_follow_topics_user_id"/>
+
+        <addForeignKeyConstraint
+                baseTableName="user_follow_topics" baseColumnNames="topic_id"
+                referencedTableName="topics" referencedColumnNames="id"
+                constraintName="fk_user_follow_topics_topic_id"/>
+
+        <createIndex tableName="user_follow_topics" indexName="idx_user_follow_topics_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+    </changeSet>
+</databaseChangeLog>

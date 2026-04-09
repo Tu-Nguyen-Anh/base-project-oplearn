@@ -16,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import org.oplearn.project.entity.user.User;
+import org.oplearn.project.security.UserAuthenticated;
+
 import java.util.List;
 
 import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.DEFAULT_LANGUAGE;
@@ -132,9 +135,16 @@ public class SourceController {
     ) {
         log.info("(getAllWithTopics)");
 
+        Long userId = null;
+        try {
+            User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
+            userId = currentUser.getId();
+        } catch (Exception ignored) {
+        }
+
         return ResponseGeneral.ofSuccess(
                 messageService.getMessage(SUCCESS, language),
-                sourceService.getAllWithTopics());
+                sourceService.getAllWithTopics(userId));
     }
 }
 
