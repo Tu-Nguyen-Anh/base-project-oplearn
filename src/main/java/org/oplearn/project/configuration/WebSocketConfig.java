@@ -9,7 +9,9 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
-import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.*;
+import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.APP_PREFIX;
+import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.TOPIC_PREFIX;
+import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.WEBSOCKET_ENDPOINT;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -31,8 +33,26 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .withSockJS();
     }
 
+    /**
+     * Tăng thread pool cho inbound channel để xử lý đồng thời nhiều message từ client.
+     */
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(10)
+                .queueCapacity(100);
         registration.interceptors(webSocketAuthChannelInterceptor);
+    }
+
+    /**
+     * Tăng thread pool cho outbound channel để broadcast không bị hàng đợi khi nhiều client.
+     */
+    @Override
+    public void configureClientOutboundChannel(ChannelRegistration registration) {
+        registration.taskExecutor()
+                .corePoolSize(4)
+                .maxPoolSize(10)
+                .queueCapacity(100);
     }
 }

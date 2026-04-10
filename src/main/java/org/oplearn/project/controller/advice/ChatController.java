@@ -17,8 +17,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.security.Principal;
 
 import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.CHAT_TOPIC;
@@ -33,7 +31,6 @@ public class ChatController {
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @Transactional
     @MessageMapping("/chat/{groupId}")
     public void sendMessage(
             @DestinationVariable Long groupId,

@@ -22,4 +22,5 @@ public class GroupMemberResponse {
     private String avatar;
     private String role;
     private Boolean online;
+    private Long lastSeen;
 }

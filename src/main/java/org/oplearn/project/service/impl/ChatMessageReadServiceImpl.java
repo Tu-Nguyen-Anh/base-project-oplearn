@@ -12,10 +12,12 @@ import org.oplearn.project.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -56,19 +58,23 @@ public class ChatMessageReadServiceImpl implements ChatMessageReadService {
 
     @Override
     public List<ReaderResponse> getReaders(Long messageId) {
-        return chatMessageReadRepository.findAllByMessageId(messageId)
-                .stream()
-                .map(read -> {
-                    User user = userService.getById(read.getUserId());
-                    return ReaderResponse.builder()
-                            .userId(user.getId())
-                            .username(user.getUsername())
-                            .fullName(user.getFullName())
-                            .avatar(user.getAvatar())
-                            .readAt(read.getReadAt())
-                            .build();
-                })
-                .toList();
+        List<ChatMessageRead> reads = chatMessageReadRepository.findAllByMessageId(messageId);
+        if (reads.isEmpty()) return List.of();
+
+        Set<Long> userIds = reads.stream().map(ChatMessageRead::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userMap = userService.getByIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        return reads.stream().map(read -> {
+            User user = userMap.get(read.getUserId());
+            return ReaderResponse.builder()
+                    .userId(user.getId())
+                    .username(user.getUsername())
+                    .fullName(user.getFullName())
+                    .avatar(user.getAvatar())
+                    .readAt(read.getReadAt())
+                    .build();
+        }).toList();
     }
 
     @Override
@@ -78,16 +84,17 @@ public class ChatMessageReadServiceImpl implements ChatMessageReadService {
         }
 
         List<ChatMessageRead> reads = chatMessageReadRepository.findAllByMessageIdIn(messageIds);
+        if (reads.isEmpty()) return Map.of();
 
-        Map<Long, User> userCache = reads.stream()
-                .map(ChatMessageRead::getUserId)
-                .distinct()
-                .collect(Collectors.toMap(id -> id, userService::getById));
+        // Batch load users — 1 query thay vì N queries
+        Set<Long> userIds = reads.stream().map(ChatMessageRead::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userMap = userService.getByIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
 
         return reads.stream().collect(Collectors.groupingBy(
                 ChatMessageRead::getMessageId,
                 Collectors.mapping(read -> {
-                    User user = userCache.get(read.getUserId());
+                    User user = userMap.get(read.getUserId());
                     return ReaderResponse.builder()
                             .userId(user.getId())
                             .username(user.getUsername())

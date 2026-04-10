@@ -9,6 +9,7 @@ import org.oplearn.project.service.PresenceService;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
@@ -27,6 +28,7 @@ public class WebSocketEventListener {
     private final ChatGroupService chatGroupService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    @Async
     @EventListener
     public void handleWebSocketConnected(SessionConnectedEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
@@ -39,13 +41,14 @@ public class WebSocketEventListener {
         broadcastPresence(user, true);
     }
 
+    @Async
     @EventListener
     public void handleWebSocketDisconnected(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         User user = extractUser(accessor);
         if (user == null) return;
 
-        presenceService.setOffline(user.getId());
+        presenceService.setOffline(user.getId()); // lưu lastSeen vào Redis trước
         log.info("(WebSocket disconnected) userId: {}, username: {}", user.getId(), user.getUsername());
 
         broadcastPresence(user, false);
@@ -63,9 +66,13 @@ public class WebSocketEventListener {
     }
 
     private void broadcastPresence(User user, boolean online) {
-        PresenceEvent event = online
-                ? PresenceEvent.online(user.getId(), user.getUsername(), user.getFullName(), user.getAvatar())
-                : PresenceEvent.offline(user.getId(), user.getUsername(), user.getFullName(), user.getAvatar());
+        PresenceEvent event;
+        if (online) {
+            event = PresenceEvent.online(user.getId(), user.getUsername(), user.getFullName(), user.getAvatar());
+        } else {
+            Long lastSeen = presenceService.getLastSeen(user.getId());
+            event = PresenceEvent.offline(user.getId(), user.getUsername(), user.getFullName(), user.getAvatar(), lastSeen);
+        }
 
         chatGroupService.getGroupsByUserId(user.getId()).forEach(group ->
                 messagingTemplate.convertAndSend(

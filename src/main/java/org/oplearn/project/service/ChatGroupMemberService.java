@@ -3,6 +3,7 @@ package org.oplearn.project.service;
 import org.oplearn.project.entity.chat.ChatGroupMember;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ChatGroupMemberService {
     ChatGroupMember addMember(Long groupId, Long userId, String role);
@@ -12,6 +13,9 @@ public interface ChatGroupMemberService {
     void makeAdmin(Long groupId, Long userId);
 
     List<ChatGroupMember> getMembersByGroupId(Long groupId);
+
+    /** Batch load members cho nhiều group cùng lúc — tránh N+1 queries. */
+    Map<Long, List<ChatGroupMember>> getMembersByGroupIds(List<Long> groupIds);
 
     ChatGroupMember getMember(Long groupId, Long userId);
 

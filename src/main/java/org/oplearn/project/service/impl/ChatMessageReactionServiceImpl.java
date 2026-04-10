@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -65,11 +67,12 @@ public class ChatMessageReactionServiceImpl implements ChatMessageReactionServic
         }
 
         List<ChatMessageReaction> reactions = chatMessageReactionRepository.findAllByMessageIdIn(messageIds);
+        if (reactions.isEmpty()) return Map.of();
 
-        Map<Long, User> userCache = reactions.stream()
-                .map(ChatMessageReaction::getUserId)
-                .distinct()
-                .collect(Collectors.toMap(id -> id, userService::getById));
+        // Batch load users — 1 query thay vì N queries
+        Set<Long> userIds = reactions.stream().map(ChatMessageReaction::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userCache = userService.getByIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
 
         Map<Long, List<ChatMessageReaction>> grouped = reactions.stream()
                 .collect(Collectors.groupingBy(ChatMessageReaction::getMessageId));
@@ -83,10 +86,10 @@ public class ChatMessageReactionServiceImpl implements ChatMessageReactionServic
     }
 
     private List<ReactionResponse> buildReactionResponses(List<ChatMessageReaction> reactions, Long currentUserId) {
-        Map<Long, User> userCache = reactions.stream()
-                .map(ChatMessageReaction::getUserId)
-                .distinct()
-                .collect(Collectors.toMap(id -> id, userService::getById));
+        if (reactions.isEmpty()) return List.of();
+        Set<Long> userIds = reactions.stream().map(ChatMessageReaction::getUserId).collect(Collectors.toSet());
+        Map<Long, User> userCache = userService.getByIds(userIds).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
         return buildReactionResponsesWithCache(reactions, currentUserId, userCache);
     }
 

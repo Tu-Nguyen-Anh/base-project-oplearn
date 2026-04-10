@@ -24,3 +24,4 @@ logging:
   level:
     org.hibernate.SQL: OFF
     org.hibernate.type.descriptor.sql: OFF
+    software.amazon.awssdk: WARN

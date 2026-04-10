@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.oplearn.project.constanst.OpLearnConstants.ChatConstants.ROLE_ADMIN;
 
@@ -59,6 +61,14 @@ public class ChatGroupMemberServiceImpl implements ChatGroupMemberService {
     @Override
     public List<ChatGroupMember> getMembersByGroupId(Long groupId) {
         return chatGroupMemberRepository.findAllByGroupIdAndDeletedFalse(groupId);
+    }
+
+    @Override
+    public Map<Long, List<ChatGroupMember>> getMembersByGroupIds(List<Long> groupIds) {
+        if (groupIds.isEmpty()) return Map.of();
+        return chatGroupMemberRepository.findAllByGroupIdInAndDeletedFalse(groupIds)
+                .stream()
+                .collect(Collectors.groupingBy(ChatGroupMember::getGroupId));
     }
 
     @Override

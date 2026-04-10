@@ -11,4 +11,6 @@ public interface PresenceService {
     boolean isOnline(Long userId);
 
     Set<Long> getOnlineUserIds(List<Long> userIds);
+
+    Long getLastSeen(Long userId);
 }

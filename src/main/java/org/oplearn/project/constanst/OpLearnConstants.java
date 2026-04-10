@@ -156,13 +156,65 @@ public class OpLearnConstants {
         public static final String NOT_MESSAGE_SENDER = "org.oplearn.project.exception.base.chat.NotMessageSenderException";
     }
 
+    public static final class FeedbackStatus {
+        private FeedbackStatus() {
+        }
+
+        public static final int PENDING = 0;
+        public static final int IN_REVIEW = 1;
+        public static final int RESOLVED = 2;
+        public static final int REJECTED = 3;
+
+        public static String label(int status) {
+            return switch (status) {
+                case PENDING -> "PENDING";
+                case IN_REVIEW -> "IN_REVIEW";
+                case RESOLVED -> "RESOLVED";
+                case REJECTED -> "REJECTED";
+                default -> "UNKNOWN";
+            };
+        }
+    }
+
+    public static final class FeedbackException {
+        private FeedbackException() {
+        }
+
+        public static final String FEEDBACK_NOT_FOUND = "org.oplearn.project.exception.base.feedback.FeedbackNotFoundException";
+        public static final String FEEDBACK_NOT_OWNER = "org.oplearn.project.exception.base.feedback.FeedbackNotOwnerException";
+    }
+
+    public static final class StorageException {
+        private StorageException() {
+        }
+
+        public static final String INVALID_FILE_TYPE = "org.oplearn.project.exception.base.storage.InvalidFileTypeException";
+        public static final String FILE_TOO_LARGE = "org.oplearn.project.exception.base.storage.FileTooLargeException";
+        public static final String UPLOAD_FAILED = "org.oplearn.project.exception.base.storage.UploadFailedException";
+    }
+
+    public static final class StorageConstants {
+        private StorageConstants() {
+        }
+
+        public static final long MAX_IMAGE_SIZE_BYTES = 10L * 1024 * 1024; // 10MB
+        public static final String[] ALLOWED_IMAGE_TYPES = {
+                "image/jpeg", "image/png", "image/gif", "image/webp"
+        };
+        public static final int MAX_IMAGES_PER_REQUEST = 10;
+        public static final String FEEDBACK_IMAGE_FOLDER = "feedbacks";
+        public static final String AVATAR_FOLDER = "avatars";
+    }
+
     public static final class ChatPresence {
         private ChatPresence() {
         }
 
         public static final String ONLINE_USERS_KEY = "CHAT_ONLINE_USERS";
         public static final String USER_ONLINE_KEY_PREFIX = "presence:online:";
+        public static final String USER_LAST_SEEN_KEY_PREFIX = "presence:last_seen:";
         public static final long ONLINE_TTL_MINUTES = 5L;
+        public static final long LAST_SEEN_TTL_DAYS = 30L;
         public static final String PRESENCE_TOPIC = "/topic/chat/%s/presence";
         public static final String READ_RECEIPT_TOPIC = "/topic/chat/%s/read";
         public static final String REACTION_TOPIC = "/topic/chat/%s/reaction";

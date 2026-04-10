@@ -39,6 +39,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,17 +140,34 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         }
     }
 
+    /**
+     * Tối ưu: thay vì N*2 queries (isAdmin + countMembers mỗi group),
+     * dùng 1 batch query lấy tất cả members rồi xử lý trong memory.
+     */
     @Override
     public List<GroupResponse> getMyGroups() {
         User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
-        return chatGroupService.getGroupsByUserId(currentUser.getId()).stream().map(group -> {
-            String myRole = chatGroupMemberService.isAdmin(group.getId(), currentUser.getId())
-                    ? ROLE_ADMIN : ROLE_MEMBER;
-            int memberCount = chatGroupMemberService.countMembers(group.getId());
-            return mapToGroupResponse(group, myRole, memberCount);
+        List<ChatGroup> groups = chatGroupService.getGroupsByUserId(currentUser.getId());
+        if (groups.isEmpty()) return List.of();
+
+        List<Long> groupIds = groups.stream().map(ChatGroup::getId).toList();
+        Map<Long, List<ChatGroupMember>> membersByGroup = chatGroupMemberService.getMembersByGroupIds(groupIds);
+
+        return groups.stream().map(group -> {
+            List<ChatGroupMember> members = membersByGroup.getOrDefault(group.getId(), List.of());
+            String myRole = members.stream()
+                    .filter(m -> m.getUserId().equals(currentUser.getId()))
+                    .findFirst()
+                    .map(ChatGroupMember::getRole)
+                    .orElse(ROLE_MEMBER);
+            return mapToGroupResponse(group, myRole, members.size());
         }).toList();
     }
 
+    /**
+     * Tối ưu: thay vì N queries getById per member,
+     * dùng 1 batch query getByIds rồi map trong memory.
+     */
     @Override
     public GroupDetailResponse getGroupDetail(Long groupId) {
         User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
@@ -162,11 +180,18 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
 
         List<ChatGroupMember> members = chatGroupMemberService.getMembersByGroupId(groupId);
         List<Long> memberUserIds = members.stream().map(ChatGroupMember::getUserId).toList();
+
+        // Batch load users — 1 DB query
+        Map<Long, User> userMap = userService.getByIds(new HashSet<>(memberUserIds)).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        // Batch check online — 1 Redis pipeline
         Set<Long> onlineIds = presenceService.getOnlineUserIds(memberUserIds);
 
         List<GroupMemberResponse> memberResponses = members.stream()
                 .map(m -> {
-                    User user = userService.getById(m.getUserId());
+                    User user = userMap.get(m.getUserId());
+                    boolean online = onlineIds.contains(user.getId());
                     return GroupMemberResponse.builder()
                             .memberId(m.getId())
                             .userId(user.getId())
@@ -174,7 +199,8 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
                             .fullName(user.getFullName())
                             .avatar(user.getAvatar())
                             .role(m.getRole())
-                            .online(onlineIds.contains(user.getId()))
+                            .online(online)
+                            .lastSeen(online ? null : presenceService.getLastSeen(user.getId()))
                             .build();
                 })
                 .toList();
@@ -224,7 +250,8 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         chatGroupHistoryService.saveHistory(groupId, ADD_MEMBER,
                 String.format("%s đã thêm %s vào nhóm", currentUser.getFullName(), newUser.getFullName()));
 
-        return mapToMemberResponse(member, presenceService.isOnline(newUser.getId()));
+        boolean online = presenceService.isOnline(newUser.getId());
+        return mapToMemberResponse(member, newUser, online);
     }
 
     @Transactional
@@ -441,6 +468,9 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         return reactions;
     }
 
+    /**
+     * Tối ưu: batch load users và batch check online status.
+     */
     @Override
     public List<GroupMemberResponse> getOnlineMembers(Long groupId) {
         User currentUser = UserAuthenticated.getCurrentUserThrowUnAuthorized();
@@ -450,10 +480,16 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
 
         List<ChatGroupMember> members = chatGroupMemberService.getMembersByGroupId(groupId);
         List<Long> memberUserIds = members.stream().map(ChatGroupMember::getUserId).toList();
+
+        // Batch load users
+        Map<Long, User> userMap = userService.getByIds(new HashSet<>(memberUserIds)).stream()
+                .collect(Collectors.toMap(User::getId, Function.identity()));
+
+        // Batch check online status — 1 Redis pipeline
         Set<Long> onlineIds = presenceService.getOnlineUserIds(memberUserIds);
 
         return members.stream()
-                .map(m -> mapToMemberResponse(m, onlineIds.contains(m.getUserId())))
+                .map(m -> mapToMemberResponse(m, userMap.get(m.getUserId()), onlineIds.contains(m.getUserId())))
                 .toList();
     }
 
@@ -463,6 +499,8 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
         presenceService.setOnline(currentUser.getId());
         log.debug("(heartbeat) userId: {}", currentUser.getId());
     }
+
+    // ─── Private helpers ──────────────────────────────────────────────────────
 
     private GroupResponse mapToGroupResponse(ChatGroup group, String myRole, int memberCount) {
         return GroupResponse.builder()
@@ -476,8 +514,7 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
                 .build();
     }
 
-    private GroupMemberResponse mapToMemberResponse(ChatGroupMember member, boolean online) {
-        User user = userService.getById(member.getUserId());
+    private GroupMemberResponse mapToMemberResponse(ChatGroupMember member, User user, boolean online) {
         return GroupMemberResponse.builder()
                 .memberId(member.getId())
                 .userId(user.getId())
@@ -486,6 +523,7 @@ public class ChatGroupFacadeServiceImpl implements ChatGroupFacadeService {
                 .avatar(user.getAvatar())
                 .role(member.getRole())
                 .online(online)
+                .lastSeen(online ? null : presenceService.getLastSeen(user.getId()))
                 .build();
     }
 
