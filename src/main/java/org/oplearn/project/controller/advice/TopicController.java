@@ -13,6 +13,7 @@ import org.oplearn.project.facade.TopicFacadeService;
 import org.oplearn.project.service.TopicService;
 import org.oplearn.project.service.base.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class TopicController {
     private final TopicFacadeService topicFacadeService;
     private final MessageService messageService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseGeneral<TopicResponse> create(
@@ -43,6 +45,7 @@ public class TopicController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseGeneral<TopicResponse> update(
             @RequestBody @Validated TopicRequest request,
@@ -57,6 +60,7 @@ public class TopicController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseGeneral<Void> delete(
             @PathVariable Long id,

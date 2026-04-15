@@ -6,8 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.oplearn.project.entity.user.enums.UserRole;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +21,7 @@ public class UserResponse {
   private String phoneNumber;
   private String email;
   private int status;
+  private UserRole role;
 
   public UserResponse(Long id, String username) {
     this.id = id;

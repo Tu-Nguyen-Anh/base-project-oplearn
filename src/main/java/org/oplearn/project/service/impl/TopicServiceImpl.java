@@ -62,7 +62,8 @@ public class TopicServiceImpl implements TopicService {
                 topicRequest.getName(),
                 topicRequest.getUrl(),
                 topicRequest.getRssUrl(),
-                topicRequest.getDescription()
+                topicRequest.getDescription(),
+                source.getId()
         );
     }
 

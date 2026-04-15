@@ -8,6 +8,7 @@ import org.oplearn.project.dto.response.dashboard.ArticleDailyResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleGrowthResponse;
 import org.oplearn.project.facade.DashboardFacadeService;
 import org.oplearn.project.service.base.MessageService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +19,7 @@ import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.DEF
 import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.LANGUAGE;
 import static org.oplearn.project.constanst.OpLearnConstants.Message.SUCCESS;
 
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @Slf4j
 @RequiredArgsConstructor

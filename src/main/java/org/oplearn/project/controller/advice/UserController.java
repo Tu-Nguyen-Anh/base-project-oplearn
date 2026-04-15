@@ -16,6 +16,7 @@ import org.oplearn.project.facade.UserFacadeService;
 import org.oplearn.project.service.UserService;
 import org.oplearn.project.service.base.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +33,7 @@ public class UserController {
     private final UserFacadeService userFacadeService;
     private final MessageService messageService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseGeneral<UserResponse> create(
@@ -46,6 +48,7 @@ public class UserController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseGeneral<UserResponse> update(
             @RequestBody @Validated UserRequest request,
@@ -60,6 +63,7 @@ public class UserController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseGeneral<Void> delete(
             @PathVariable Long id,
@@ -130,6 +134,7 @@ public class UserController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("{id}/histories")
     public ResponseGeneral<PageResponse<UserHistoryResponse>> histories(
             @PathVariable Long id,
@@ -144,6 +149,7 @@ public class UserController {
                 userFacadeService.getHistories(id, page, size));
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("reset-password/{id}")
     public ResponseGeneral<Void> resetPassword(
             @PathVariable Long id,
@@ -186,6 +192,7 @@ public class UserController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/filter")
     public ResponseGeneral<PageResponse<UserFilterResponse>> histories(
             @RequestBody UserFilterRequest userFilterRequest,

@@ -1,11 +1,10 @@
 package org.oplearn.project.entity.user;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.oplearn.project.entity.base.AuditEntity;
+import org.oplearn.project.entity.user.enums.UserRole;
 
 import static org.oplearn.project.constanst.OpLearnConstants.ActiveStatus.ACTIVE;
 import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.DEFAULT_PASSWORD;
@@ -33,6 +32,9 @@ public class User extends AuditEntity {
     private String avatar;
     private Integer status;
     private Boolean deleted;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role")
+    private UserRole role;
 
     public User(
             String username,
@@ -48,6 +50,7 @@ public class User extends AuditEntity {
         this.phoneNumber = phoneNumber;
         this.status = status;
         this.deleted = false;
+        this.role = UserRole.USER;
     }
 
     public User(String username, String fullName) {
@@ -72,5 +75,6 @@ public class User extends AuditEntity {
         this.phoneNumber = phoneNumber;
         this.status = ACTIVE;
         this.deleted = false;
+        this.role = UserRole.USER;
     }
 }

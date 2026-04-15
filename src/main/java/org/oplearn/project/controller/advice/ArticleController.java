@@ -14,6 +14,7 @@ import org.oplearn.project.facade.ArticleFacadeService;
 import org.oplearn.project.service.ArticleService;
 import org.oplearn.project.service.base.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class ArticleController {
     private final ArticleFacadeService articleFacadeService;
     private final MessageService messageService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseGeneral<ArticleResponse> create(
@@ -44,6 +46,7 @@ public class ArticleController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     @PutMapping("{id}")
     public ResponseGeneral<ArticleResponse> update(
             @RequestBody @Validated ArticleRequest request,
@@ -58,6 +61,7 @@ public class ArticleController {
         );
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'AUTHOR')")
     @DeleteMapping("{id}")
     public ResponseGeneral<Void> delete(
             @PathVariable Long id,

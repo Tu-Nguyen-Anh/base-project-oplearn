@@ -15,13 +15,16 @@ import org.oplearn.project.exception.base.BaseException;
 import org.oplearn.project.service.UserService;
 import org.oplearn.project.service.authenticate.TokenService;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.oplearn.project.entity.user.enums.UserRole;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.BEARER_TOKEN_TYPE_START;
@@ -78,11 +81,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
+            UserRole userRole = user.getRole() != null ? user.getRole() : UserRole.USER;
+            List<GrantedAuthority> authorities = List.of(
+                    new SimpleGrantedAuthority("ROLE_" + userRole.name())
+            );
+
             var authentication = new UsernamePasswordAuthenticationToken(
                     user,
                     null,
-                    new ArrayList<>()
-
+                    authorities
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
             filterChain.doFilter(request, response);

@@ -10,6 +10,7 @@ import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
 import org.oplearn.project.annotation.PhoneNumberValidation;
 import org.oplearn.project.annotation.ValidationName;
+import org.oplearn.project.entity.user.enums.UserRole;
 
 import static org.oplearn.project.constanst.OpLearnConstants.ActiveStatus.ACTIVE;
 
@@ -36,6 +37,8 @@ public class UserRequest {
 
     private int status;
 
+    private UserRole role;
+
     public UserRequest(
             String username,
             String fullName,
@@ -47,5 +50,6 @@ public class UserRequest {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.status = ACTIVE;
+        this.role = UserRole.USER;
     }
 }

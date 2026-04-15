@@ -17,6 +17,7 @@ import org.oplearn.project.security.UserAuthenticated;
 import org.oplearn.project.service.FeedbackService;
 import org.oplearn.project.service.base.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static org.oplearn.project.constanst.OpLearnConstants.CommonConstants.DEFAULT_LANGUAGE;
@@ -140,6 +141,7 @@ public class FeedbackController {
                     @ApiResponse(responseCode = "401", description = "Chưa xác thực")
             }
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/api/v1/admin/feedbacks")
     public ResponseGeneral<PageResponse<FeedbackResponse>> getAllFeedbacks(
             @Parameter(description = "Lọc theo trạng thái (0-3), bỏ trống để lấy tất cả")
@@ -163,6 +165,7 @@ public class FeedbackController {
                     @ApiResponse(responseCode = "404", description = "Không tìm thấy góp ý")
             }
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/api/v1/admin/feedbacks/{feedbackId}/status")
     public ResponseGeneral<FeedbackResponse> updateFeedbackStatus(
             @PathVariable Long feedbackId,

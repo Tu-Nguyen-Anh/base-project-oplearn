@@ -8,6 +8,7 @@ import org.oplearn.project.dto.response.user.UserFilterResponse;
 import org.oplearn.project.dto.response.user.UserMentionResponse;
 import org.oplearn.project.dto.response.user.UserResponse;
 import org.oplearn.project.entity.user.User;
+import org.oplearn.project.entity.user.enums.UserRole;
 import org.oplearn.project.exception.base.ForbiddenException;
 import org.oplearn.project.exception.base.UserNotFoundException;
 import org.oplearn.project.exception.base.user.EmailAlreadyExistedException;
@@ -78,16 +79,20 @@ public class UserServiceImpl implements UserService {
     }
 
     private User mapRequestToEntity(UserRequest userRequest) {
-        return new User(
+        User user = new User(
                 userRequest.getUsername(),
                 userRequest.getFullName(),
                 userRequest.getEmail(),
                 userRequest.getPhoneNumber()
         );
+        if (userRequest.getRole() != null) {
+            user.setRole(userRequest.getRole());
+        }
+        return user;
     }
 
     private UserResponse mapEntityToResponse(User user) {
-        return new UserResponse(
+        UserResponse response = new UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getFullName(),
@@ -95,6 +100,8 @@ public class UserServiceImpl implements UserService {
                 user.getEmail(),
                 user.getStatus()
         );
+        response.setRole(user.getRole());
+        return response;
     }
 
     @Transactional
@@ -272,6 +279,9 @@ public class UserServiceImpl implements UserService {
         }
         if (request.getPhoneNumber() != null) {
             user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getRole() != null) {
+            user.setRole(request.getRole());
         }
         user.setStatus(request.getStatus());
     }

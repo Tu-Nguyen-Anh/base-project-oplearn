@@ -28,6 +28,7 @@
     <include file="db/changelog/20260409-0001-user_follow_topics.xml"/>
     <include file="db/changelog/20260410-0001-feedbacks.xml"/>
     <include file="db/changelog/20260410-0002-feedback_images.xml"/>
+    <include file="db/changelog/20260410-0003-users-add-role.xml"/>
     <include file="db/data/data.xml"/>
 
 </databaseChangeLog>

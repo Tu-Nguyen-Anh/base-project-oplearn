@@ -29,6 +29,7 @@ public interface UserRepository extends BaseRepository<User> {
                 u.fullName,
                 u.phoneNumber,
                 u.status,
+                u.role,
                 u.createdBy,
                 u.createdAt
                 )

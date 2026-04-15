@@ -13,6 +13,7 @@ import org.oplearn.project.facade.SourceFacadeService;
 import org.oplearn.project.service.SourceService;
 import org.oplearn.project.service.base.MessageService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +35,7 @@ public class SourceController {
     private final SourceFacadeService sourceFacadeService;
     private final MessageService messageService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public ResponseGeneral<SourceResponse> create(
@@ -48,6 +50,7 @@ public class SourceController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("{id}")
     public ResponseGeneral<SourceResponse> update(
             @RequestBody @Validated SourceRequest request,
@@ -62,6 +65,7 @@ public class SourceController {
         );
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("{id}")
     public ResponseGeneral<Void> delete(
             @PathVariable Long id,
