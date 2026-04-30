@@ -19,6 +19,7 @@ public class SourceFilterRequest {
     private Integer size;
     private String keyword;
     private List<Integer> type;
+    private Boolean active;
 }
 
 

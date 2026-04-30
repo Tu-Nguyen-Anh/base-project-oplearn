@@ -19,9 +19,10 @@ public class TopicFilterResponse {
     private String sourceName;
     private String createdBy;
     private Long createdAt;
+    private Boolean active;
 
     public TopicFilterResponse(Long id, String name, String url, String rssUrl, String description,
-                               Long sourceId, String sourceName, String createdBy, Long createdAt) {
+                               Long sourceId, String sourceName, String createdBy, Long createdAt, Boolean active) {
         this.id = id;
         this.name = name;
         this.url = url;
@@ -31,6 +32,7 @@ public class TopicFilterResponse {
         this.sourceName = sourceName;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
+        this.active = active;
     }
 }
 

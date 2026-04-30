@@ -1,3 +1,4 @@
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/repository/SourceRepository.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/user/PhoneNumberAlreadyExistedException.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/impl/ChatMessageReactionServiceImpl.java
@@ -95,6 +96,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/request/authenticate/CreateTokenRequest.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/facade/ChatGroupFacadeService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/ConflictException.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/job/TopicHealthCheckJob.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/article/Article.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/utils/PasswordEncoderUtils.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/configuration/MessageSourceConfiguration.java
@@ -102,6 +104,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/source/NameAlreadyExistedException.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/request/TopicFilterRequest.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/authenticate/LoginResponse.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/repository/projection/TopicMonthlyCountProjection.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/chat/ChatGroupMember.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/ArticleViewHistoryService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/NotificationService.java
@@ -168,6 +171,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/dashboard/ArticleBySourceResponse.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/user/UserMentionResponse.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/chat/MemberAlreadyExistsException.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/repository/projection/TopicDailyCountProjection.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/FeedbackService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/request/TopicRequest.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/authenticate/AuthenticationInfo.java
@@ -227,6 +231,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/user/User.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/blog/BlogPostComment.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/facade/SourceFacadeService.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/user/enums/UserRole.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/UserFollowTopicService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/facade/ArticleFacadeService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/SourceService.java
@@ -255,6 +260,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/ChatGroupMemberService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/utils/converter/JsonConverter.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/repository/ArticleCommentRepository.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/security/error/UnAuthorizationCustomHandler.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/user/DuplicatedUsernameException.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/article/FavoriteNotFoundException.java
@@ -288,6 +294,7 @@
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/service/PresenceService.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/topic/FollowedTopicResponse.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/entity/blog/BlogPost.java
+/home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/configuration/SchedulerConfiguration.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/facade/impl/TopicFacadeServiceImpl.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/exception/base/BadRequestException.java
 /home/tu/base-news/base-project-oplearn/src/main/java/org/oplearn/project/dto/response/notification/NotificationResponse.java

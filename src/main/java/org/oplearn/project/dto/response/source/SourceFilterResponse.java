@@ -18,9 +18,10 @@ public class SourceFilterResponse {
     private String description;
     private String createdBy;
     private Long createdAt;
+    private Boolean active;
 
     public SourceFilterResponse(Long id, String name, String url, String avatar, Integer type,
-                                String description, String createdBy, Long createdAt) {
+                                String description, String createdBy, Long createdAt, Boolean active) {
         this.id = id;
         this.name = name;
         this.url = url;
@@ -29,6 +30,7 @@ public class SourceFilterResponse {
         this.description = description;
         this.createdBy = createdBy;
         this.createdAt = createdAt;
+        this.active = active;
     }
 }
 

@@ -29,6 +29,8 @@
     <include file="db/changelog/20260410-0001-feedbacks.xml"/>
     <include file="db/changelog/20260410-0002-feedback_images.xml"/>
     <include file="db/changelog/20260410-0003-users-add-role.xml"/>
+    <include file="db/changelog/20260430-0001-topics-add-active.xml"/>
+    <include file="db/changelog/20260430-0002-sources-add-active.xml"/>
     <include file="db/data/data.xml"/>
 
 </databaseChangeLog>

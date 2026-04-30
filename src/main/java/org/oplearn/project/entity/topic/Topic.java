@@ -34,6 +34,9 @@ public class Topic extends AuditEntity {
     @Column(name = "deleted")
     private Boolean deleted;
 
+    @Column(name = "active")
+    private Boolean active;
+
     public Topic(
             String name,
             String url,
@@ -47,17 +50,20 @@ public class Topic extends AuditEntity {
         this.description = description;
         this.sourceId = sourceId;
         this.deleted = false;
+        this.active = true;
     }
 
     public Topic(String name, String url) {
         this.name = name;
         this.url = url;
         this.deleted = false;
+        this.active = true;
     }
 
     public Topic(String name) {
         this.name = name;
         this.deleted = false;
+        this.active = true;
     }
 
     public Topic(
@@ -71,6 +77,7 @@ public class Topic extends AuditEntity {
         this.rssUrl = rssUrl;
         this.description = description;
         this.deleted = false;
+        this.active = true;
     }
 
 }

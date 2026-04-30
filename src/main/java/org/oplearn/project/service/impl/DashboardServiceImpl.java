@@ -3,11 +3,15 @@ package org.oplearn.project.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.oplearn.project.dto.response.dashboard.ArticleBySourceResponse;
+import org.oplearn.project.dto.response.dashboard.ArticleByTopicResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleDailyResponse;
 import org.oplearn.project.dto.response.dashboard.ArticleGrowthResponse;
+import org.oplearn.project.dto.response.dashboard.ArticleTopicDailyResponse;
 import org.oplearn.project.repository.ArticleRepository;
 import org.oplearn.project.repository.projection.DailyCountProjection;
 import org.oplearn.project.repository.projection.MonthlyCountProjection;
+import org.oplearn.project.repository.projection.TopicDailyCountProjection;
+import org.oplearn.project.repository.projection.TopicMonthlyCountProjection;
 import org.oplearn.project.service.DashboardService;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +21,7 @@ import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -125,6 +130,110 @@ public class DashboardServiceImpl implements DashboardService {
                 .totalDays(totalDays)
                 .days(days)
                 .total(total)
+                .build();
+    }
+
+    @Override
+    public ArticleByTopicResponse getArticleCountByTopic(int year) {
+        log.debug("(getArticleCountByTopic) year: {}", year);
+
+        List<TopicMonthlyCountProjection> rawData = articleRepository.countArticlesByTopicAndMonth(year);
+
+        Map<Long, String> topicNames = new LinkedHashMap<>();
+        Map<Long, Map<Integer, Long>> topicMonthData = new LinkedHashMap<>();
+
+        for (TopicMonthlyCountProjection row : rawData) {
+            topicNames.putIfAbsent(row.getTopicId(), row.getTopicName());
+            topicMonthData
+                    .computeIfAbsent(row.getTopicId(), k -> new HashMap<>())
+                    .put(row.getMonth(), row.getCount());
+        }
+
+        List<ArticleByTopicResponse.TopicData> topics = topicNames.entrySet().stream()
+                .map(entry -> {
+                    Long topicId = entry.getKey();
+                    Map<Integer, Long> monthMap = topicMonthData.getOrDefault(topicId, Collections.emptyMap());
+
+                    List<ArticleByTopicResponse.MonthlyCount> monthlyData = IntStream.rangeClosed(1, 12)
+                            .mapToObj(m -> ArticleByTopicResponse.MonthlyCount.builder()
+                                    .month(m)
+                                    .monthName(Month.of(m).getDisplayName(TextStyle.SHORT, Locale.ENGLISH))
+                                    .count(monthMap.getOrDefault(m, 0L))
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    long topicTotal = monthlyData.stream().mapToLong(ArticleByTopicResponse.MonthlyCount::getCount).sum();
+
+                    return ArticleByTopicResponse.TopicData.builder()
+                            .topicId(topicId)
+                            .topicName(entry.getValue())
+                            .monthlyData(monthlyData)
+                            .total(topicTotal)
+                            .build();
+                })
+                .sorted(Comparator.comparing(ArticleByTopicResponse.TopicData::getTopicId))
+                .collect(Collectors.toList());
+
+        long grandTotal = topics.stream().mapToLong(ArticleByTopicResponse.TopicData::getTotal).sum();
+
+        return ArticleByTopicResponse.builder()
+                .year(year)
+                .topics(topics)
+                .grandTotal(grandTotal)
+                .build();
+    }
+
+    @Override
+    public ArticleTopicDailyResponse getArticleCountByTopicAndDay(int year, int month, Long topicId) {
+        log.debug("(getArticleCountByTopicAndDay) year: {}, month: {}, topicId: {}", year, month, topicId);
+
+        List<TopicDailyCountProjection> rawData = articleRepository.countArticlesByTopicAndDay(year, month, topicId);
+
+        int totalDays = YearMonth.of(year, month).lengthOfMonth();
+
+        // group raw rows by topicId
+        Map<Long, String> topicNames = new LinkedHashMap<>();
+        Map<Long, Map<Integer, Long>> topicDayData = new LinkedHashMap<>();
+
+        for (TopicDailyCountProjection row : rawData) {
+            topicNames.putIfAbsent(row.getTopicId(), row.getTopicName());
+            topicDayData
+                    .computeIfAbsent(row.getTopicId(), k -> new HashMap<>())
+                    .put(row.getDay(), row.getCount());
+        }
+
+        List<ArticleTopicDailyResponse.TopicDailyData> topics = topicNames.entrySet().stream()
+                .map(entry -> {
+                    Long tid = entry.getKey();
+                    Map<Integer, Long> dayMap = topicDayData.getOrDefault(tid, Collections.emptyMap());
+
+                    List<ArticleTopicDailyResponse.DailyCount> days = IntStream.rangeClosed(1, totalDays)
+                            .mapToObj(d -> ArticleTopicDailyResponse.DailyCount.builder()
+                                    .day(d)
+                                    .count(dayMap.getOrDefault(d, 0L))
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    long topicTotal = days.stream().mapToLong(ArticleTopicDailyResponse.DailyCount::getCount).sum();
+
+                    return ArticleTopicDailyResponse.TopicDailyData.builder()
+                            .topicId(tid)
+                            .topicName(entry.getValue())
+                            .days(days)
+                            .total(topicTotal)
+                            .build();
+                })
+                .sorted(Comparator.comparing(ArticleTopicDailyResponse.TopicDailyData::getTopicId))
+                .collect(Collectors.toList());
+
+        long grandTotal = topics.stream().mapToLong(ArticleTopicDailyResponse.TopicDailyData::getTotal).sum();
+
+        return ArticleTopicDailyResponse.builder()
+                .year(year)
+                .month(month)
+                .totalDays(totalDays)
+                .topics(topics)
+                .grandTotal(grandTotal)
                 .build();
     }
 }

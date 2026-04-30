@@ -40,6 +40,16 @@ COPY --from=builder ${WORKDIR}/dependencies/ ./
 COPY --from=builder ${WORKDIR}/spring-boot-loader/ ./
 COPY --from=builder ${WORKDIR}/snapshot-dependencies/ ./
 COPY --from=builder ${WORKDIR}/application/ ./
-ENTRYPOINT ["java", "-XX:+UseG1GC", "-Xms512m", "-Xmx768m", "-Xss512k", "-XX:MaxRAM=72m", "org.springframework.boot.loader.launch.JarLauncher"]
 
+# Default JVM options — overridable từ docker-compose qua biến JAVA_OPTS
+ENV JAVA_OPTS="\
+  -XX:+UseContainerSupport \
+  -XX:+UseG1GC \
+  -XX:MaxGCPauseMillis=200 \
+  -Xms256m \
+  -Xmx512m \
+  -XX:MaxMetaspaceSize=256m \
+  -Xss512k \
+  -XX:+ExitOnOutOfMemoryError"
 
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]

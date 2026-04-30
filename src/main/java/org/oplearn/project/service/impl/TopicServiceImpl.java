@@ -73,7 +73,8 @@ public class TopicServiceImpl implements TopicService {
                 topic.getName(),
                 topic.getUrl(),
                 topic.getRssUrl(),
-                topic.getDescription()
+                topic.getDescription(),
+                topic.getActive()
         );
     }
 
@@ -137,6 +138,7 @@ public class TopicServiceImpl implements TopicService {
         Page<TopicFilterResponse> topics = repository.filter(
                 keyword,
                 request.getSourceId(),
+                request.getActive(),
                 pageable
         );
 

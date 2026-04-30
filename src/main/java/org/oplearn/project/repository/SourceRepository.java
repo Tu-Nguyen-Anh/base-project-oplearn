@@ -28,7 +28,8 @@ public interface SourceRepository extends BaseRepository<Source> {
                 s.type,
                 s.description,
                 s.createdBy,
-                s.createdAt
+                s.createdAt,
+                s.active
                 )
               FROM Source s
               WHERE
@@ -39,11 +40,13 @@ public interface SourceRepository extends BaseRepository<Source> {
                                 )
                 AND s.deleted = false
                 AND (:type IS NULL OR s.type IN :type)
+                AND (:active IS NULL OR s.active = :active)
               ORDER BY s.createdAt DESC
         """)
     Page<SourceFilterResponse> filter(
             @Param("keyword") String keyword,
             @Param("type") List<Integer> type,
+            @Param("active") Boolean active,
             Pageable pageable
     );
 

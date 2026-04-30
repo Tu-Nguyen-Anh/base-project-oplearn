@@ -78,7 +78,8 @@ public class SourceServiceImpl implements SourceService {
                 source.getUrl(),
                 source.getAvatar(),
                 source.getType(),
-                source.getDescription()
+                source.getDescription(),
+                source.getActive()
         );
     }
 
@@ -142,6 +143,7 @@ public class SourceServiceImpl implements SourceService {
         Page<SourceFilterResponse> sources = repository.filter(
                 keyword,
                 request.getType(),
+                request.getActive(),
                 pageable
         );
 

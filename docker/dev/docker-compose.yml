@@ -56,17 +56,32 @@ services:
     env_file:
       - .env
     environment:
-      JAVA_OPTS: "-Xms512m -Xmx4g -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -XX:+UseG1GC"
+      # Ghi đè JAVA_OPTS từ Dockerfile.
+      # Heap tối đa 512m + Metaspace 256m + overhead ~200m ≈ tổng ~968m < 1G limit.
+      # ExitOnOutOfMemoryError: crash nhanh thay vì treo → container tự restart.
+      # UseContainerSupport: JVM đọc đúng CPU/mem của container, không lấy của host.
+      JAVA_OPTS: >-
+        -XX:+UseContainerSupport
+        -XX:+UseG1GC
+        -XX:MaxGCPauseMillis=200
+        -Xms256m
+        -Xmx512m
+        -XX:MaxMetaspaceSize=256m
+        -Xss512k
+        -XX:+ExitOnOutOfMemoryError
     networks:
       - news_network
     deploy:
       resources:
         limits:
-          cpus: '2.0'
-          memory: 6G
+          # Cứng: container không bao giờ vượt ngưỡng này,
+          # đảm bảo postgres/redis không bị ảnh hưởng khi spike.
+          cpus: '1.0'
+          memory: 1G
         reservations:
-          cpus: '0.5'
-          memory: 1536M
+          # Mềm: Docker đảm bảo luôn có sẵn lượng này cho service.
+          cpus: '0.25'
+          memory: 512M
 
 volumes:
   postgres_news_data:

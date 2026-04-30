@@ -3,6 +3,7 @@ org/oplearn/project/dto/response/source/SourceFilterResponse.class
 org/oplearn/project/exception/base/chat/ReactionNotFoundException.class
 org/oplearn/project/dto/response/user/UserHistoryResponse.class
 org/oplearn/project/exception/base/user/PhoneNumberAlreadyExistedException.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse$ArticleTopicDailyResponseBuilder.class
 org/oplearn/project/controller/advice/ExceptionHandlerAdvice.class
 org/oplearn/project/dto/response/chat/GroupDetailResponse.class
 org/oplearn/project/exception/base/chat/NotMessageSenderException.class
@@ -20,6 +21,7 @@ org/oplearn/project/dto/response/chat/GroupMemberResponse.class
 org/oplearn/project/repository/BaseRepository.class
 org/oplearn/project/constanst/OpLearnConstants$StatusException.class
 org/oplearn/project/exception/base/SourceNotFoundException.class
+org/oplearn/project/configuration/SchedulerConfiguration.class
 org/oplearn/project/exception/base/user/DuplicatedPhoneNumberException.class
 org/oplearn/project/exception/base/chat/NotGroupMemberException.class
 org/oplearn/project/configuration/JpaRepositoryConfiguration.class
@@ -37,6 +39,7 @@ org/oplearn/project/service/impl/StorageServiceImpl.class
 org/oplearn/project/filter/WebSocketAuthChannelInterceptor.class
 org/oplearn/project/dto/request/UserFilterRequest.class
 org/oplearn/project/dto/response/chat/ChatMessageResponse.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse.class
 org/oplearn/project/dto/request/authenticate/CreateTokenRequest.class
 org/oplearn/project/entity/chat/ChatGroupHistory$ChatGroupHistoryBuilder.class
 org/oplearn/project/configuration/auditor/AuditorAwareImpl.class
@@ -50,6 +53,7 @@ org/oplearn/project/annotation/ValidationName$NameValidate.class
 org/oplearn/project/exception/base/feedback/FeedbackNotOwnerException.class
 org/oplearn/project/service/ChatGroupMemberService.class
 org/oplearn/project/annotation/PhoneNumberValidation.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse$MonthlyCount.class
 org/oplearn/project/dto/request/authenticate/LoginRequest.class
 org/oplearn/project/service/impl/ChatGroupServiceImpl.class
 org/oplearn/project/dto/response/feedback/FeedbackResponse$FeedbackResponseBuilder.class
@@ -59,6 +63,7 @@ org/oplearn/project/dto/response/ResponseGeneral.class
 org/oplearn/project/service/impl/ChatMessageReactionServiceImpl.class
 org/oplearn/project/constanst/OpLearnConstants$ActiveStatus.class
 org/oplearn/project/service/FeedbackService.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse$TopicData$TopicDataBuilder.class
 org/oplearn/project/configuration/StorageProperties.class
 org/oplearn/project/security/UserAuthenticated.class
 org/oplearn/project/exception/base/user/UsernameAlreadyExistedException.class
@@ -66,6 +71,7 @@ org/oplearn/project/entity/user/User.class
 org/oplearn/project/exception/base/user/EmailAlreadyExistedException.class
 org/oplearn/project/exception/base/UnauthorizedException.class
 org/oplearn/project/constanst/OpLearnConstants$ChatPresence.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse$DailyCount.class
 org/oplearn/project/service/base/impl/MessageServiceImpl.class
 org/oplearn/project/annotation/ValidationMatchPassword.class
 org/oplearn/project/dto/response/chat/ReaderResponse.class
@@ -85,12 +91,14 @@ org/oplearn/project/service/impl/SourceServiceImpl.class
 org/oplearn/project/exception/base/chat/ChatMessageNotFoundException.class
 org/oplearn/project/configuration/SwaggerConfiguration.class
 org/oplearn/project/entity/chat/ChatMessage.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse$TopicDailyData.class
 org/oplearn/project/security/error/UnAuthorizationCustomHandler.class
 org/oplearn/project/service/impl/UserHistoryServiceImpl.class
 org/oplearn/project/exception/base/user/UsernameNotNullException.class
 org/oplearn/project/exception/base/feedback/FeedbackNotFoundException.class
 org/oplearn/project/service/ChatMessageReactionService.class
 org/oplearn/project/dto/request/authenticate/ChangePasswordRequest.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse.class
 org/oplearn/project/dto/response/chat/ReadReceiptEvent.class
 org/oplearn/project/constanst/OpLearnConstants$MessageException.class
 org/oplearn/project/repository/FeedbackImageRepository.class
@@ -98,6 +106,7 @@ org/oplearn/project/utils/DateTimeUtils.class
 org/oplearn/project/dto/response/authenticate/AuthenticationInfo.class
 org/oplearn/project/dto/response/chat/ReactionResponse$ReactionResponseBuilder.class
 org/oplearn/project/controller/advice/UploadController.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse$TopicData.class
 org/oplearn/project/exception/base/user/DuplicatedUsernameException.class
 org/oplearn/project/controller/advice/SourceController.class
 org/oplearn/project/exception/base/user/NewPasswordIncorrectException.class
@@ -155,6 +164,7 @@ org/oplearn/project/dto/request/chat/SendMessageRequest.class
 org/oplearn/project/entity/base/BaseEntity.class
 org/oplearn/project/facade/AuthenticateFacadeService.class
 org/oplearn/project/entity/source/Source.class
+org/oplearn/project/repository/projection/TopicMonthlyCountProjection.class
 org/oplearn/project/dto/response/PageResponse.class
 org/oplearn/project/exception/base/NotFoundException.class
 org/oplearn/project/entity/feedback/Feedback.class
@@ -180,17 +190,23 @@ org/oplearn/project/facade/impl/AuthenticateFacadeServiceImpl.class
 org/oplearn/project/controller/advice/AuthenticateController.class
 org/oplearn/project/dto/request/chat/AddMemberRequest.class
 org/oplearn/project/service/ChatGroupHistoryService.class
+org/oplearn/project/job/TopicHealthCheckJob.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse$MonthlyCount$MonthlyCountBuilder.class
 org/oplearn/project/dto/request/feedback/CreateFeedbackRequest.class
 org/oplearn/project/annotation/ValidateFullName.class
 org/oplearn/project/annotation/TrackTime.class
+org/oplearn/project/dto/response/dashboard/ArticleByTopicResponse$ArticleByTopicResponseBuilder.class
 org/oplearn/project/dto/response/chat/ReactionResponse$ReactorInfo$ReactorInfoBuilder.class
 org/oplearn/project/configuration/WebSocketEventListener.class
 org/oplearn/project/exception/base/auth/UsernameOrEmailInvalidException.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse$DailyCount$DailyCountBuilder.class
+org/oplearn/project/dto/response/dashboard/ArticleTopicDailyResponse$TopicDailyData$TopicDailyDataBuilder.class
 org/oplearn/project/dto/response/chat/RecallEvent.class
 org/oplearn/project/dto/response/chat/ReactionResponse$ReactorInfo.class
 org/oplearn/project/facade/impl/ChatGroupFacadeServiceImpl.class
 org/oplearn/project/configuration/WebSocketConfig.class
 org/oplearn/project/service/impl/ChatGroupHistoryServiceImpl.class
+org/oplearn/project/repository/projection/TopicDailyCountProjection.class
 org/oplearn/project/controller/advice/UserController.class
 org/oplearn/project/facade/SourceFacadeService.class
 org/oplearn/project/dto/request/authenticate/ForgotPasswordRequest.class

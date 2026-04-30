@@ -4,6 +4,8 @@ import org.oplearn.project.dto.response.article.ArticleFilterResponse;
 import org.oplearn.project.entity.article.Article;
 import org.oplearn.project.repository.projection.DailyCountProjection;
 import org.oplearn.project.repository.projection.MonthlyCountProjection;
+import org.oplearn.project.repository.projection.TopicDailyCountProjection;
+import org.oplearn.project.repository.projection.TopicMonthlyCountProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -92,6 +94,42 @@ public interface ArticleRepository extends BaseRepository<Article> {
             ORDER BY s.id, 3
             """, nativeQuery = true)
     List<Object[]> countArticlesBySourceAndMonth(@Param("year") int year);
+
+    @Query(value = """
+            SELECT t.id                                                                        AS topic_id,
+                   t.name                                                                      AS topic_name,
+                   CAST(EXTRACT(MONTH FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER)   AS month,
+                   COUNT(*)                                                                    AS count
+            FROM articles a
+                     JOIN topics t ON a.topic_id = t.id
+            WHERE CAST(EXTRACT(YEAR FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :year
+              AND a.deleted = false
+              AND t.deleted = false
+            GROUP BY t.id, t.name, 3
+            ORDER BY t.id, 3
+            """, nativeQuery = true)
+    List<TopicMonthlyCountProjection> countArticlesByTopicAndMonth(@Param("year") int year);
+
+    @Query(value = """
+            SELECT t.id                                                                      AS topic_id,
+                   t.name                                                                    AS topic_name,
+                   CAST(EXTRACT(DAY FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER)   AS day,
+                   COUNT(*)                                                                  AS count
+            FROM articles a
+                     JOIN topics t ON a.topic_id = t.id
+            WHERE CAST(EXTRACT(YEAR FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER)  = :year
+              AND CAST(EXTRACT(MONTH FROM TO_TIMESTAMP(a.created_at / 1000.0)) AS INTEGER) = :month
+              AND a.deleted = false
+              AND t.deleted = false
+              AND (:topicId IS NULL OR t.id = :topicId)
+            GROUP BY t.id, t.name, 3
+            ORDER BY t.id, 3
+            """, nativeQuery = true)
+    List<TopicDailyCountProjection> countArticlesByTopicAndDay(
+            @Param("year") int year,
+            @Param("month") int month,
+            @Param("topicId") Long topicId
+    );
 
     @Query("""
         SELECT new org.oplearn.project.dto.response.article.ArticleFilterResponse(

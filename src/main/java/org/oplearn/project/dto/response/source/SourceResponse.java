@@ -18,19 +18,21 @@ public class SourceResponse {
     private String avatar;
     private Integer type;
     private String description;
+    private Boolean active;
 
     public SourceResponse(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public SourceResponse(Long id, String name, String url, String avatar, Integer type, String description) {
+    public SourceResponse(Long id, String name, String url, String avatar, Integer type, String description, Boolean active) {
         this.id = id;
         this.name = name;
         this.url = url;
         this.avatar = avatar;
         this.type = type;
         this.description = description;
+        this.active = active;
     }
 }
 

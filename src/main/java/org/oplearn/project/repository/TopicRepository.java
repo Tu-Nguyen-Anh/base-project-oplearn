@@ -32,7 +32,8 @@ public interface TopicRepository extends BaseRepository<Topic> {
                 t.sourceId,
                 s.name,
                 t.createdBy,
-                t.createdAt
+                t.createdAt,
+                t.active
                 )
               FROM Topic t
               LEFT JOIN Source s ON t.sourceId = s.id
@@ -45,13 +46,18 @@ public interface TopicRepository extends BaseRepository<Topic> {
                                 )
                 AND t.deleted = false
                 AND (:sourceId IS NULL OR t.sourceId = :sourceId)
+                AND (:active IS NULL OR t.active = :active)
               ORDER BY t.createdAt DESC
         """)
     Page<TopicFilterResponse> filter(
             @Param("keyword") String keyword,
             @Param("sourceId") Long sourceId,
+            @Param("active") Boolean active,
             Pageable pageable
     );
+
+    @Query("SELECT t FROM Topic t WHERE t.deleted = false AND t.rssUrl IS NOT NULL AND t.rssUrl <> ''")
+    List<Topic> findAllWithRssUrl();
 
     @Query("""
         SELECT t

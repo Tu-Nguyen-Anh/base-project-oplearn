@@ -17,6 +17,7 @@ public class TopicFilterRequest {
     private Integer size;
     private String keyword;
     private Long sourceId;
+    private Boolean active;
 }
 
 
